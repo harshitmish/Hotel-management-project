@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     
     'hotel_project.booking',   
 ]
-]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
