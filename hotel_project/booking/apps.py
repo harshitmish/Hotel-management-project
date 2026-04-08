@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class BookingConfig(AppConfig):
-    name = 'booking'
+    name = 'hotel_project.booking'
