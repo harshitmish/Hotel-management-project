@@ -1,0 +1,49 @@
+{% extends 'booking/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="bg-image"></div>
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 glass-card" style="width: 500px;">
+
+        <h2 class="text-center mb-4">🏨 Book a Room</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'book_room' %}">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label>Your Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label>Select Room</label>
+                <select name="room" class="form-select">
+                    {% for room in rooms %}
+                        <option value="{{ room.id }}">{{ room.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Select Date</label>
+                <input type="date" name="date" class="form-control" required>
+            </div>
+
+            <button class="btn btn-primary w-100">🚀 Book Now</button>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

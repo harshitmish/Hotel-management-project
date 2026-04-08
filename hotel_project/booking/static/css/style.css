@@ -1,0 +1,20 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial;
+}
+
+.bg-image {
+    background: url("https://images.unsplash.com/photo-1566073771259-6a8506099945") no-repeat center center/cover;
+    height: 100%;
+    position: fixed;
+    width: 100%;
+    z-index: -1;
+}
+
+.glass-card {
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
