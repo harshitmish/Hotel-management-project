@@ -3,8 +3,10 @@ from .models import Room, Booking
 from django.contrib import messages
 from datetime import date as today_date
 
+from django.http import HttpResponse
+
 def home(request):
-    return render(request, 'booking/home.html')
+    return HttpResponse("Working ✅")
 
 def rooms(request):
     rooms = Room.objects.all()
