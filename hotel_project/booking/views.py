@@ -6,7 +6,7 @@ from datetime import date as today_date
 from django.http import HttpResponse
 
 def home(request):
-    return HttpResponse("Working ✅")
+    return render(request, 'booking/home.html')
 
 def rooms(request):
     rooms = Room.objects.all()
