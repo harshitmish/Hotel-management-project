@@ -1,79 +1,8 @@
 {% extends 'booking/base.html' %}
+
 {% block content %}
-...your content...
+
+<h1>Welcome to My Hotel</h1>
+<p>This is home page</p>
+
 {% endblock %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Hotel Management</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial;
-        }
-
-        .navbar {
-            background: black;
-            color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin: 0 10px;
-        }
-
-        .hero {
-            height: 400px;
-            background: url('https://images.unsplash.com/photo-1566073771259-6a8506099945') no-repeat center/cover;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 40px;
-            font-weight: bold;
-        }
-
-        .section {
-            padding: 40px;
-            text-align: center;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            background: orange;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Navbar -->
-    <div class="navbar">
-        <div><b>My Hotel</b></div>
-        <div>
-            <a href="#">Home</a>
-            <a href="#">Rooms</a>
-            <a href="#">Booking</a>
-            <a href="#">Login</a>
-        </div>
-    </div>
-<!-- hero section -->
-   <div class="section">
-    <h2>Book Your Stay Now</h2>
-    <p>Best rooms at best price</p>
-
-    <a href="/book/">
-    <button class="btn">Book Now</button>
-</a>
-
-    <!-- 👇 new button -->
-    <a href="/rooms/">
-        <button class="btn">View Rooms 🏨</button>
-    </a>
-</div>

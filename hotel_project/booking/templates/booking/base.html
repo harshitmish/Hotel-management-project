@@ -10,6 +10,7 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
@@ -18,18 +19,31 @@
 <!-- 🔥 Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
-    <a class="navbar-brand" href="/">🏨 Hotel</a>
+
+    <a class="navbar-brand" href="/">My Hotel</a>
 
     <div>
-      <a class="btn btn-outline-light me-2" href="/">Home</a>
-      <a class="btn btn-outline-light me-2" href="/rooms/">Rooms</a>
-      <a class="btn btn-primary" href="/book/">Book</a>
+        <a class="nav-link d-inline text-white" href="/">Home</a>
+        <a class="nav-link d-inline text-white" href="/rooms/">Rooms</a>
+        <a class="nav-link d-inline text-white" href="/book/">Book</a>
+
+        {% if user.is_authenticated %}
+            <a class="nav-link d-inline text-white" href="/my-bookings/">My Bookings</a>
+            <span class="text-white">Welcome, {{ user.username }}</span>
+            <a class="nav-link d-inline text-white" href="/logout/">Logout</a>
+        {% else %}
+            <a class="nav-link d-inline text-white" href="/login/">Login</a>
+            <a class="nav-link d-inline text-white" href="/signup/">Signup</a>
+        {% endif %}
     </div>
+
   </div>
 </nav>
 
 <!-- Page Content -->
-{% block content %}{% endblock %}
+<div class="container mt-4">
+    {% block content %}{% endblock %}
+</div>
 
 </body>
 </html>

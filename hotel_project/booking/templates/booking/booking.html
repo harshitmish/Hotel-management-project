@@ -1,13 +1,10 @@
 {% extends 'booking/base.html' %}
-
 {% load static %}
 
 {% block content %}
 
-<div class="bg-image"></div>
-
 <div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-4 glass-card" style="width: 500px;">
+    <div class="card p-4" style="width: 500px;">
 
         <h2 class="text-center mb-4">🏨 Book a Room</h2>
 
@@ -19,11 +16,6 @@
 
         <form method="POST" action="{% url 'book_room' %}">
             {% csrf_token %}
-
-            <div class="mb-3">
-                <label>Your Name</label>
-                <input type="text" name="name" class="form-control" required>
-            </div>
 
             <div class="mb-3">
                 <label>Select Room</label>
