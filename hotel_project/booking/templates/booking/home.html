@@ -84,6 +84,53 @@
 }
 
 </style>
+<style>
+
+/* 📱 MOBILE FIX */
+@media (max-width: 768px) {
+
+    /* HERO TEXT */
+    #hero-text {
+        font-size: 28px !important;
+    }
+
+    .hero-overlay + div p {
+        font-size: 14px !important;
+    }
+
+    /* HERO HEIGHT */
+    div[style*="height:80vh"] {
+        height: 60vh !important;
+    }
+
+    /* CARD */
+    .room-img {
+        height: 180px !important;
+    }
+
+    /* SPACING */
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    /* BUTTON */
+    .btn-danger {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    /* TEXT */
+    h2 {
+        font-size: 22px !important;
+    }
+
+    p {
+        font-size: 14px !important;
+    }
+}
+
+</style>
 {% endblock %}
 
 {% block content %}
