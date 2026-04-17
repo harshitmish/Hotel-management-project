@@ -57,14 +57,13 @@ body {
     z-index: 10;
 }
 
-/* 🔥 REVIEW FIX (IMPORTANT) */
+/* 🔥 REVIEW FIX */
 .review-box {
     max-height: 80px;
     overflow-y: auto;
     padding-right: 5px;
 }
 
-/* scroll styling */
 .review-box::-webkit-scrollbar {
     width: 4px;
 }
@@ -88,23 +87,57 @@ body {
     font-weight: 500;
 }
 
-/* 🔥 FIX HEIGHT ALIGNMENT */
+/* 🔥 HEIGHT FIX */
 .card-body {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
+
+/* 🔥 MOBILE PERFECT FIX (SAFE) */
+
+@media (max-width: 768px) {
+
+    /* 🔥 ROW RESET */
+    .row {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    /* 🔥 CONTAINER CENTER */
+    .container {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    /* 🔥 COLUMN FIX */
+    .col-lg-4,
+    .col-md-6,
+    .col-12 {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    /* 🔥 CARD WIDTH FIX */
+    .card-premium {
+        width: 100%;
+    }
+
+}
+
 </style>
 
 <div class="container mt-5">
-    <form method="GET" class="row mb-4">
+    <form method="GET" class="row mb-4 filter-box">
 
-    <div class="col-md-3">
-        <input type="text" name="q" class="form-control" placeholder="Search rooms">
+    <div class="col-lg-3 col-md-6 col-12 mb-2">
+        <input type="text" name="q" class="form-control" placeholder="🔍 Search rooms">
     </div>
 
-    <div class="col-md-2">
+    <div class="col-lg-2 col-md-6 col-12 mb-2">
         <select name="type" class="form-control">
             <option value="">All Types</option>
             <option value="AC">AC</option>
@@ -113,15 +146,15 @@ body {
         </select>
     </div>
 
-    <div class="col-md-2">
-        <input type="number" name="min_price" class="form-control" placeholder="Min Price">
+    <div class="col-lg-2 col-md-6 col-6 mb-2">
+        <input type="number" name="min_price" class="form-control" placeholder="Min ₹">
     </div>
 
-    <div class="col-md-2">
-        <input type="number" name="max_price" class="form-control" placeholder="Max Price">
+    <div class="col-lg-2 col-md-6 col-6 mb-2">
+        <input type="number" name="max_price" class="form-control" placeholder="Max ₹">
     </div>
 
-    <div class="col-md-2">
+    <div class="col-lg-2 col-md-12 col-12 mb-2">
         <button class="btn btn-danger w-100">Apply</button>
     </div>
 
@@ -131,19 +164,19 @@ body {
 
 <div class="row justify-content-center">
 {% for room in rooms %}
-<div class="col-md-4 mb-4">
+
+<!-- 🔥 ONLY CHANGE HERE -->
+<div class="col-lg-4 col-md-6 col-12 mb-4">
 
 <div class="card card-premium position-relative room-card"
      data-url="{% url 'room_detail' room.id %}">
 
-    <!-- 🔥 BADGE -->
     {% if room.is_available %}
     <div class="badge-custom">Available</div>
     {% else %}
     <div class="badge-custom" style="background:red;">Booked</div>
     {% endif %}
 
-    <!-- 🔥 CAROUSEL FIX -->
     <div id="carousel{{ room.id }}" class="carousel slide">
         <div class="carousel-inner">
             {% for img in room.images.all %}
@@ -164,7 +197,6 @@ body {
         </button>
     </div>
 
-    <!-- 🔥 BODY -->
     <div class="card-body text-center">
 
         <div>
@@ -179,7 +211,6 @@ body {
             <small class="text-muted">No reviews yet</small>
             {% endif %}
 
-            <!-- 🔥 REVIEWS FIXED -->
             <div class="review-box text-start mt-2">
                 {% for review in room.reviews.all|slice:":2" %}
                 <div class="review-card">

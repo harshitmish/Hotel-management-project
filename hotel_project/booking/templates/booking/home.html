@@ -4,6 +4,36 @@
 {% block extra_css %}
 <style>
 
+/* 📱 MOBILE CENTER FIX (SAFE) */
+@media (max-width: 768px) {
+
+    /* container fix */
+    .container {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    /* row fix */
+    .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        justify-content: center !important;
+    }
+
+    /* column fix */
+    .row > div {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    /* card full width */
+    .col-md-4,
+    .col-lg-4 {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+}
 /* 🔥 CARD HOVER */
 .card {
     transition: 0.3s ease;
@@ -158,10 +188,12 @@
     <h2 class="text-center fw-bold">✨ Featured Rooms</h2>
     <p class="text-center text-muted">Handpicked premium rooms for you</p>
 
-    <div class="row mt-4">
+    <!-- 🔥 FIXED ROW -->
+    <div class="row mt-4 justify-content-center">
 
         {% for room in rooms %}
-        <div class="col-md-4 mb-4 fade-in" style="animation-delay: {{ forloop.counter0 }}00ms;">
+        <!-- 🔥 EACH CARD COLUMN -->
+        <div class="col-lg-4 col-md-6 col-12 mb-4 fade-in" style="animation-delay: {{ forloop.counter0 }}00ms;">
 
             <div class="card shadow-sm room-card"
                  data-url="{% url 'room_detail' room.id %}">

@@ -110,28 +110,39 @@
 
 <!-- 🔥 Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark py-3">
+
   <div class="container">
 
     <a class="navbar-brand fw-bold" href="/">🏨 My Hotel</a>
 
-    <div class="ms-auto">
+    <!-- 🔥 TOGGLE BUTTON -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <a class="nav-link d-inline mx-2 {% if request.path == '/' %}active-link{% else %}text-white{% endif %}" href="/">Home</a>
+    <!-- 🔥 MENU -->
+    <div class="collapse navbar-collapse" id="navbarNav">
 
-        <a class="nav-link d-inline mx-2 {% if '/rooms' in request.path %}active-link{% else %}text-white{% endif %}" href="/rooms/">Rooms</a>
+        <div class="ms-auto text-center">
 
-        {% if user.is_authenticated %}
-            <a class="nav-link d-inline mx-2 {% if '/my-bookings' in request.path %}active-link{% else %}text-white{% endif %}" href="/my-bookings/">My Bookings</a>
-            <span class="text-white mx-2">Hi, {{ user.username }}</span>
-            <a class="nav-link d-inline mx-2 text-danger" href="/logout/">Logout</a>
-        {% else %}
-            <a class="nav-link d-inline mx-2 {% if '/login' in request.path %}active-link{% else %}text-white{% endif %}" href="/login/">Login</a>
-            <a class="nav-link d-inline mx-2 {% if '/signup' in request.path %}active-link{% else %}text-white{% endif %}" href="/signup/">Signup</a>
-        {% endif %}
+            <a class="nav-link d-block d-lg-inline mx-2 text-white" href="/">Home</a>
+            <a class="nav-link d-block d-lg-inline mx-2 text-white" href="/rooms/">Rooms</a>
+
+            {% if user.is_authenticated %}
+                <a class="nav-link d-block d-lg-inline mx-2 text-white" href="/my-bookings/">My Bookings</a>
+                <span class="text-white d-block d-lg-inline mx-2">Hi, {{ user.username }}</span>
+                <a class="nav-link d-block d-lg-inline mx-2 text-danger" href="/logout/">Logout</a>
+            {% else %}
+                <a class="nav-link d-block d-lg-inline mx-2 text-white" href="/login/">Login</a>
+                <a class="nav-link d-block d-lg-inline mx-2 text-white" href="/signup/">Signup</a>
+            {% endif %}
+
+        </div>
 
     </div>
 
   </div>
+
 </nav>
 
 <!-- Page Content -->
@@ -317,7 +328,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 </body>
 <!-- 🔥 PREMIUM FOOTER -->
-<footer style="background:#0f0f1a; color:#fff; padding:50px 0; margin-top:60px; border-top:1px solid rgba(255,255,255,0.1);">
+<footer style="background:#0f0f1a; color:#ffffff; padding:50px 0; margin-top:60px; border-top:1px solid rgba(255,255,255,0.1);">
 
     <div class="container text-center">
 
@@ -352,7 +363,7 @@ document.addEventListener("DOMContentLoaded", function() {
     transition: 0.3s;
 }
 .footer-link:hover {
-    color: #6c5ce7;
+    color: #b0145a;
 }
 </style>
 </html>
