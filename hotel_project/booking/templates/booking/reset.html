@@ -1,0 +1,23 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+
+<div class="container d-flex justify-content-center align-items-center" style="height:80vh;">
+    <div class="card shadow p-4" style="width:350px; border-radius:15px;">
+
+        <h4 class="text-center mb-3">🔐 Reset Password</h4>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input name="password" type="password" class="form-control mb-3" placeholder="New Password" required>
+            <button class="btn btn-danger w-100">Update Password</button>
+        </form>
+
+        {% if error %}
+            <p class="text-danger mt-2 text-center">{{ error }}</p>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

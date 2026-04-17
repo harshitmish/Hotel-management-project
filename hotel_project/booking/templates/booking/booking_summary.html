@@ -1,0 +1,108 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+
+<style>
+.summary-card {
+    max-width: 550px;
+    margin: auto;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.summary-header {
+    background: linear-gradient(45deg, #ff4d4d, #ff6b6b);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.summary-body {
+    padding: 20px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 15px;
+}
+
+.summary-item span {
+    color: gray;
+}
+
+.confirm-btn {
+    border-radius: 25px;
+    padding: 10px;
+    font-weight: bold;
+    background: linear-gradient(45deg, #28a745, #5cd65c);
+    border: none;
+}
+
+.confirm-btn:hover {
+    transform: scale(1.05);
+}
+</style>
+
+<div class="container mt-5">
+
+    <div class="summary-card">
+
+        <!-- 🔥 HEADER -->
+        <div class="summary-header">
+            <h3>📋 Booking Summary</h3>
+            <p class="mb-0">{{ room.name }}</p>
+        </div>
+
+        <!-- 🔥 BODY -->
+        <div class="summary-body">
+
+            <div class="summary-item">
+                <span>📅 Check-in</span>
+                <b>{{ data.check_in }}</b>
+            </div>
+
+            <div class="summary-item">
+                <span>📅 Check-out</span>
+                <b>{{ data.check_out }}</b>
+            </div>
+
+            <div class="summary-item">
+                <span>👤 Name</span>
+                <b>{{ data.name }}</b>
+            </div>
+
+            <div class="summary-item">
+                <span>📞 Phone</span>
+                <b>{{ data.phone }}</b>
+            </div>
+
+            <div class="summary-item">
+                <span>👥 People</span>
+                <b>{{ data.people }}</b>
+            </div>
+
+            <div class="summary-item">
+                <span>🪪 ID Proof</span>
+                <b>{{ data.id_proof }}</b>
+            </div>
+
+            <hr>
+
+            <!-- 🔥 CONFIRM BUTTON -->
+            <form method="POST">
+                {% csrf_token %}
+                <button class="btn confirm-btn w-100">
+                    ✅ Confirm Booking
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card p-4 shadow">
+        <h3 class="mb-3">⭐ Add Review for {{ room.name }}</h3>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="fw-bold">Rating (1–5)</label>
+
+                <!-- 🔥 SAME NESTED STRUCTURE (NO REMOVE) -->
+                <div class="mb-3">
+                    <label class="fw-bold">Rating</label><br>
+
+                    <!-- 🔥 FIXED STAR STRUCTURE -->
+                    <div id="star-rating" style="font-size:30px; cursor:pointer;">
+                        <span data-value="1">☆</span>
+                        <span data-value="2">☆</span>
+                        <span data-value="3">☆</span>
+                        <span data-value="4">☆</span>
+                        <span data-value="5">☆</span>
+                    </div>
+
+                    <!-- hidden input (IMPORTANT) -->
+                    <input type="hidden" name="rating" id="rating-value" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">Comment</label>
+                <textarea name="comment" class="form-control" rows="3" required></textarea>
+            </div>
+
+            <button class="btn btn-primary w-100">Submit Review</button>
+        </form>
+
+        <!-- 🔥 FIXED JS (STRUCTURE SAME, LOGIC CHANGED) -->
+        <script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const stars = document.querySelectorAll("#star-rating span");
+    const input = document.getElementById("rating-value");
+
+    stars.forEach(star => {
+        star.addEventListener("click", function() {
+            let rating = this.getAttribute("data-value");
+
+            input.value = rating;
+            console.log("Selected rating:", rating); // 🔥 debug
+
+            stars.forEach(s => {
+                if (s.getAttribute("data-value") <= rating) {
+                    s.textContent = "★";
+                    s.style.color = "gold";
+                } else {
+                    s.textContent = "☆";
+                    s.style.color = "gray";
+                }
+            });
+        });
+    });
+
+});
+</script>
+
+    </div>
+
+</div>
+
+{% endblock %}

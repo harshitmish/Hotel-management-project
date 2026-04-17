@@ -1,41 +1,120 @@
 {% extends 'booking/base.html' %}
-{% load static %}
 
 {% block content %}
 
-<div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-4" style="width: 500px;">
+<div class="container mt-5">
 
-        <h2 class="text-center mb-4">🏨 Book a Room</h2>
+    <h2 class="text-center fw-bold mb-4">📅 Book Your Room</h2>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-info">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+    <!-- 🔥 DATE RANGE FILTER -->
+    <form method="GET" class="row justify-content-center mb-4">
 
-        <form method="POST" action="{% url 'book_room' %}">
+        <div class="col-md-3">
+            <input type="date" name="check_in" class="form-control" required>
+        </div>
+
+        <div class="col-md-3">
+            <input type="date" name="check_out" class="form-control" required>
+        </div>
+
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-dark w-100">
+                Check Availability
+            </button>
+        </div>
+
+    </form>
+
+    <!-- 🔥 MESSAGES -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info text-center">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- 🔥 SELECTED ROOM FORM -->
+    {% if room %}
+    <div class="card p-4 mb-4">
+        <h4 class="text-center mb-3">Booking for {{ room.name }}</h4>
+
+        <form method="POST">
             {% csrf_token %}
 
-            <div class="mb-3">
-                <label>Select Room</label>
-                <select name="room" class="form-select">
-                    {% for room in rooms %}
-                        <option value="{{ room.id }}">{{ room.name }}</option>
+            <input type="hidden" name="room" value="{{ room.id }}">
+            <input type="hidden" name="check_in" value="{{ check_in }}">
+            <input type="hidden" name="check_out" value="{{ check_out }}">
+
+            <div class="mb-2">
+                <label>Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+
+            <div class="mb-2">
+                <label>Phone</label>
+                <input type="text" name="phone" class="form-control" required>
+            </div>
+
+            <div class="mb-2">
+                <label>ID Proof</label>
+                <input type="text" name="id_proof" class="form-control" required>
+            </div>
+
+            <!-- 🔥 PEOPLE DROPDOWN -->
+            <div class="mb-2">
+                <label>Total People</label>
+
+                <select name="total_people" class="form-control" required>
+                    <option value="">Select People</option>
+
+                    {% for i in people_range %}
+                        <option value="{{ i }}">
+                            {{ i }} Person{% if i > 1 %}s{% endif %}
+                        </option>
                     {% endfor %}
+
                 </select>
             </div>
 
-            <div class="mb-3">
-                <label>Select Date</label>
-                <input type="date" name="date" class="form-control" required>
-            </div>
-
-            <button class="btn btn-primary w-100">🚀 Book Now</button>
+            <button class="btn btn-success mt-3 w-100">
+                Confirm Booking
+            </button>
 
         </form>
+    </div>
+    {% endif %}
+
+    <!-- 🔥 ROOMS -->
+    <div class="row">
+
+        {% for room in rooms %}
+        <div class="col-md-4 mb-4">
+
+            <div class="card shadow-sm h-100">
+
+                {% if room.images.first %}
+                <img src="{{ room.images.first.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;">
+                {% endif %}
+
+                <div class="card-body text-center">
+                    <h5>{{ room.name }}</h5>
+                    <p>₹{{ room.price }} / night</p>
+
+                    <!-- 🔥 BOOK BUTTON -->
+                    <a href="{% url 'room_detail' room.id %}" class="btn btn-danger w-100">
+                        Book Now
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+        {% endfor %}
 
     </div>
+
 </div>
 
 {% endblock %}

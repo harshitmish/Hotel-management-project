@@ -1,0 +1,27 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+
+<div class="container d-flex justify-content-center align-items-center" style="height:80vh;">
+    <div class="card shadow p-4" style="width:350px; border-radius:15px;">
+
+        <h4 class="text-center mb-3">🔑 Forgot Password</h4>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input name="email" type="email" class="form-control mb-3" placeholder="Enter Email" required>
+            <button class="btn btn-warning w-100">Send Reset Link</button>
+        </form>
+
+        {% if error %}
+            <p class="text-danger mt-2 text-center">{{ error }}</p>
+        {% endif %}
+
+        {% if success %}
+            <p class="text-success mt-2 text-center">{{ success }}</p>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

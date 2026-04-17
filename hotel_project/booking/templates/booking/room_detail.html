@@ -1,0 +1,193 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <!-- 🔥 ROOM TITLE -->
+    <h2 class="fw-bold">{{ room.name }}</h2>
+    <p class="text-muted">{{ room.room_type }}</p>
+
+    <!-- 🔥 PREMIUM IMAGE GALLERY -->
+    <div class="row mb-4">
+
+        <!-- MAIN IMAGE -->
+        <div class="col-md-8 position-relative">
+            <img id="main-image"
+                 src="{% if room.images.all %}{{ room.images.all.0.image.url }}{% endif %}"
+                 class="img-fluid rounded shadow main-img"
+                 onclick="openFullscreen()">
+
+            <!-- ARROWS -->
+            <span class="arrow left" onclick="prevImage()">❮</span>
+            <span class="arrow right" onclick="nextImage()">❯</span>
+        </div>
+
+        <!-- THUMBNAILS -->
+        <div class="col-md-4">
+            {% for img in room.images.all %}
+            <img src="{{ img.image.url }}"
+                 onclick="changeImage(this, {{ forloop.counter0 }})"
+                 class="img-fluid rounded mb-2 thumb"
+                 data-index="{{ forloop.counter0 }}">
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <!-- 🔥 PRICE + BOOK -->
+    <h4 class="text-danger">₹{{ room.price }} / night</h4>
+
+    <a href="{% url 'book_room' %}?room_id={{ room.id }}" class="btn btn-danger mb-3">
+        Book Now
+    </a>
+
+    <!-- 🔥 REVIEW BUTTON -->
+    {% if user.is_authenticated %}
+        <a href="{% url 'add_review' room.id %}" class="btn btn-warning mb-4">
+            ⭐ Add Review
+        </a>
+    {% else %}
+        <p class="text-muted">Login to add review</p>
+    {% endif %}
+
+    <!-- 🔥 DETAILS -->
+    <div class="card p-3 mb-4">
+        <h5>Room Details</h5>
+        <p>{{ room.description }}</p>
+    </div>
+
+    <!-- 🔥 FEATURES -->
+    <div class="card p-3 mb-4">
+        <h5>Features</h5>
+        <p>{{ room.features }}</p>
+    </div>
+
+    <!-- 🔥 REVIEWS -->
+    <div class="card p-3">
+        <h5>Reviews</h5>
+
+        {% if reviews %}
+            {% for review in reviews %}
+                <div class="mb-3 border-bottom pb-2">
+                    <b>{{ review.user.username }}</b><br>
+
+                    <span style="color:gold;">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+
+                    <p>{{ review.comment }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No reviews yet</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- 🔥 FULLSCREEN MODAL -->
+<div id="fullscreen-modal" onclick="closeFullscreen()">
+    <img id="fullscreen-img">
+</div>
+
+<!-- 🔥 STYLE -->
+<style>
+.main-img {
+    height: 400px;
+    width: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.thumb {
+    height: 90px;
+    object-fit: cover;
+    width: 100%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.3s;
+}
+
+.thumb:hover {
+    transform: scale(1.05);
+    border: 2px solid #6c5ce7;
+}
+
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 30px;
+    color: white;
+    background: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.left { left: 10px; }
+.right { right: 10px; }
+
+#fullscreen-modal {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.9);
+    justify-content: center;
+    align-items: center;
+}
+
+#fullscreen-modal img {
+    max-width: 90%;
+    max-height: 90%;
+}
+</style>
+
+<!-- 🔥 SCRIPT -->
+<script>
+let images = [
+    {% for img in room.images.all %}
+    "{{ img.image.url }}",
+    {% endfor %}
+];
+
+let currentIndex = 0;
+
+function changeImage(el, index) {
+    document.getElementById("main-image").src = el.src;
+    currentIndex = index;
+}
+
+function nextImage() {
+    currentIndex = (currentIndex + 1) % images.length;
+    document.getElementById("main-image").src = images[currentIndex];
+}
+
+function prevImage() {
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    document.getElementById("main-image").src = images[currentIndex];
+}
+
+function openFullscreen() {
+    let modal = document.getElementById("fullscreen-modal");
+    let img = document.getElementById("fullscreen-img");
+
+    img.src = document.getElementById("main-image").src;
+    modal.style.display = "flex";
+}
+
+function closeFullscreen() {
+    document.getElementById("fullscreen-modal").style.display = "none";
+}
+</script>
+
+{% endblock %}

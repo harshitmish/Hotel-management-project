@@ -1,0 +1,67 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h2 class="text-center mb-4">📝 Complete Your Booking</h2>
+
+    <!-- messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info text-center">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card p-4 mx-auto" style="max-width:500px;">
+
+        <h5 class="text-center mb-3">{{ room.name }}</h5>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- NAME -->
+            <div class="mb-2">
+                <label>Name</label>
+                <input type="text" name="name" class="form-control" value="{{ user.username }}" required>
+            </div>
+
+            <!-- PHONE -->
+            <div class="mb-2">
+                <label>Phone</label>
+                <input type="text" name="phone" class="form-control" required>
+            </div>
+
+            <!-- PEOPLE DROPDOWN -->
+            <div class="mb-2">
+                <label>Total People</label>
+                <select name="people" class="form-control" required>
+                    <option value="">Select People</option>
+
+                    {% for i in people_range %}
+                        <option value="{{ i }}">
+                            {{ i }} Person{% if i > 1 %}s{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- ID PROOF -->
+            <div class="mb-2">
+                <label>ID Proof</label>
+                <input type="text" name="id_proof" class="form-control" required>
+            </div>
+
+            <button class="btn btn-success w-100 mt-3">
+                Confirm Booking
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

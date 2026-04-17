@@ -8,33 +8,127 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- 🔥 Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- 🔥 Custom Page CSS Block -->
+    {% block extra_css %}{% endblock %}
+
     <!-- Custom CSS -->
+    {% if '/admin' not in request.path %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% endif %}
+
+    <!-- 🔥 PREMIUM STYLE (SAME + FIXED COLORS) -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fa;  /* 🔥 FIX: same as rooms */
+            color: #333;
+        }
+
+        /* Navbar */
+        .navbar {
+            backdrop-filter: blur(10px);
+            background: #2c2c54 !important;  /* 🔥 FIX: consistent */
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .nav-link {
+            transition: 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #ffc107 !important;
+            transform: scale(1.05);
+        }
+
+        /* 🔥 ACTIVE LINK FIX */
+        .active-link {
+            color: #ffc107 !important;
+            font-weight: 600;
+        }
+
+        /* Container spacing */
+        .container {
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(10px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        /* Toast */
+        .toast {
+            border-radius: 12px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 25px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
 
+<!-- 🔥 TOAST MESSAGE (UNCHANGED) -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="toast show align-items-center text-white bg-{% if message.tags == 'success' %}success{% else %}danger{% endif %} border-0 mb-2 shadow">
+        <div class="d-flex">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.parentElement.parentElement.remove();"></button>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
 <!-- 🔥 Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark py-3">
   <div class="container">
 
-    <a class="navbar-brand" href="/">My Hotel</a>
+    <a class="navbar-brand fw-bold" href="/">🏨 My Hotel</a>
 
-    <div>
-        <a class="nav-link d-inline text-white" href="/">Home</a>
-        <a class="nav-link d-inline text-white" href="/rooms/">Rooms</a>
-        <a class="nav-link d-inline text-white" href="/book/">Book</a>
+    <div class="ms-auto">
+
+        <a class="nav-link d-inline mx-2 {% if request.path == '/' %}active-link{% else %}text-white{% endif %}" href="/">Home</a>
+
+        <a class="nav-link d-inline mx-2 {% if '/rooms' in request.path %}active-link{% else %}text-white{% endif %}" href="/rooms/">Rooms</a>
 
         {% if user.is_authenticated %}
-            <a class="nav-link d-inline text-white" href="/my-bookings/">My Bookings</a>
-            <span class="text-white">Welcome, {{ user.username }}</span>
-            <a class="nav-link d-inline text-white" href="/logout/">Logout</a>
+            <a class="nav-link d-inline mx-2 {% if '/my-bookings' in request.path %}active-link{% else %}text-white{% endif %}" href="/my-bookings/">My Bookings</a>
+            <span class="text-white mx-2">Hi, {{ user.username }}</span>
+            <a class="nav-link d-inline mx-2 text-danger" href="/logout/">Logout</a>
         {% else %}
-            <a class="nav-link d-inline text-white" href="/login/">Login</a>
-            <a class="nav-link d-inline text-white" href="/signup/">Signup</a>
+            <a class="nav-link d-inline mx-2 {% if '/login' in request.path %}active-link{% else %}text-white{% endif %}" href="/login/">Login</a>
+            <a class="nav-link d-inline mx-2 {% if '/signup' in request.path %}active-link{% else %}text-white{% endif %}" href="/signup/">Signup</a>
         {% endif %}
+
     </div>
 
   </div>
@@ -45,5 +139,220 @@
     {% block content %}{% endblock %}
 </div>
 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 🔥 AUTO HIDE TOAST -->
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.toast').forEach(t => t.remove());
+    }, 3000);
+</script>
+<!-- 🔥 CHATBOT BUTTON -->
+<div id="chat-toggle" onclick="toggleChat()">💬</div>
+
+<!-- 🔥 CHATBOX -->
+<div id="chatbot-container">
+    <div id="chat-header">
+        🤖 Hotel Assistant
+        <span onclick="toggleChat()" style="float:right; cursor:pointer;">✖</span>
+    </div>
+
+    <div id="chat-box"></div>
+
+    <!-- 🔥 SUGGESTIONS -->
+    <div id="suggestions">
+        <button onclick="quickMsg('cheap room')">Cheap</button>
+        <button onclick="quickMsg('AC room')">AC</button>
+        <button onclick="quickMsg('under 3000')">Under 3000</button>
+        <button onclick="quickMsg('2 people')">2 People</button>
+    </div>
+
+    <div id="chat-input-area">
+        <input type="text" id="user-input" placeholder="Ask something...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<style>
+#chat-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #6c5ce7;
+    color: white;
+    padding: 12px 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 9999;
+}
+
+#chatbot-container {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 320px;
+    background: #1e1e2f;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    overflow: hidden;
+    z-index: 9999;
+}
+
+#chat-header {
+    background: #6c5ce7;
+    color: white;
+    padding: 10px;
+    font-weight: bold;
+}
+
+#chat-box {
+    height: 250px;
+    overflow-y: auto;
+    padding: 10px;
+    color: white;
+    font-size: 14px;
+}
+
+.user-msg {
+    text-align: right;
+    margin: 5px;
+    background: #0984e3;
+    padding: 6px 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.bot-msg {
+    text-align: left;
+    margin: 5px;
+    background: #2d3436;
+    padding: 6px 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+#chat-input-area {
+    display: flex;
+}
+
+#chat-input-area input {
+    flex: 1;
+    border: none;
+    padding: 10px;
+}
+
+#chat-input-area button {
+    background: #6c5ce7;
+    color: white;
+    border: none;
+    padding: 10px;
+}
+
+#suggestions {
+    padding: 5px;
+    text-align: center;
+}
+
+#suggestions button {
+    margin: 2px;
+    padding: 5px 8px;
+    border: none;
+    background: #00cec9;
+    color: black;
+    border-radius: 8px;
+    cursor: pointer;
+}
+</style>
+
+<script>
+function toggleChat() {
+    let chat = document.getElementById("chatbot-container");
+    chat.style.display = chat.style.display === "none" ? "block" : "none";
+}
+
+// 🔥 quick buttons
+function quickMsg(text) {
+    document.getElementById("user-input").value = text;
+    sendMessage();
+}
+
+// 🔥 send message
+function sendMessage() {
+    let input = document.getElementById("user-input");
+    let msg = input.value;
+
+    if (!msg) return;
+
+    let box = document.getElementById("chat-box");
+
+    box.innerHTML += `<div class="user-msg">${msg}</div>`;
+
+    // 🔥 typing animation
+    let typing = `<div id="typing" class="bot-msg">Typing...</div>`;
+    box.innerHTML += typing;
+    box.scrollTop = box.scrollHeight;
+
+    fetch(`/chatbot/?message=${msg}`)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("typing").remove();
+        box.innerHTML += `<div class="bot-msg">${data.reply}</div>`;
+        box.scrollTop = box.scrollHeight;
+    });
+
+    input.value = "";
+}
+
+// 🔥 enter press
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("user-input").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            sendMessage();
+        }
+    });
+});
+</script>
 </body>
+<!-- 🔥 PREMIUM FOOTER -->
+<footer style="background:#0f0f1a; color:#fff; padding:50px 0; margin-top:60px; border-top:1px solid rgba(255,255,255,0.1);">
+
+    <div class="container text-center">
+
+        <h4 class="fw-bold mb-3">🏨 My Hotel</h4>
+        <p class="text-muted">Luxury rooms • Best prices • Trusted stays</p>
+
+        <!-- LINKS -->
+        <div class="mb-3">
+            <a href="/" class="text-white mx-2 footer-link">Home</a>
+            <a href="/rooms/" class="text-white mx-2 footer-link">Rooms</a>
+            <a href="/login/" class="text-white mx-2 footer-link">Login</a>
+        </div>
+
+        <!-- SOCIAL -->
+        <div class="mb-3">
+            <span class="mx-2">🌐</span>
+            <span class="mx-2">📸</span>
+            <span class="mx-2">🐦</span>
+        </div>
+
+        <small class="text-muted">
+            © 2026 My Hotel. All rights reserved.
+        </small>
+
+    </div>
+
+</footer>
+
+<style>
+.footer-link {
+    text-decoration: none;
+    transition: 0.3s;
+}
+.footer-link:hover {
+    color: #6c5ce7;
+}
+</style>
 </html>
