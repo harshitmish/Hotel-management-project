@@ -1,12 +1,29 @@
 {% extends "admin/base.html" %}
 
 {% block branding %}
-<h1 id="site-name">
-    <a href="/admin/">Hotel Dashboard</a>
-</h1>
 
-<a href="/admin/dashboard/" style="color:white; margin-left:20px;">
-    Dashboard
-</a>
+<div style="
+    display:flex; 
+    align-items:center; 
+    justify-content:space-between; 
+    flex-wrap:wrap;
+">
+
+    <h1 id="site-name" style="margin:0;">
+        <a href="/admin/" style="color:white; text-decoration:none;">
+            Hotel Dashboard
+        </a>
+    </h1>
+
+    <a href="/admin/dashboard/" style="
+        color:white; 
+        margin-left:20px;
+        text-decoration:none;
+        font-weight:bold;
+    ">
+        Dashboard
+    </a>
+
+</div>
 
 {% endblock %}

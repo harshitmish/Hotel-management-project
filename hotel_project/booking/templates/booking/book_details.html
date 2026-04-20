@@ -28,10 +28,30 @@
                 <input type="text" name="name" class="form-control" value="{{ user.username }}" required>
             </div>
 
-            <!-- PHONE -->
+            <!-- ✅ UPDATED PHONE -->
             <div class="mb-2">
                 <label>Phone</label>
-                <input type="text" name="phone" class="form-control" required>
+
+                <div style="display:flex; gap:10px;">
+                    
+                    <!-- Country Code -->
+                    <select name="country_code" class="form-control" style="max-width:120px;" required>
+                        <option value="+91">🇮🇳 +91</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                    </select>
+
+                    <!-- Phone Number -->
+                    <input 
+                        type="tel" 
+                        name="phone" 
+                        class="form-control"
+                        placeholder="Enter phone number"
+                        pattern="[0-9]{10}"
+                        maxlength="10"
+                        required
+                    >
+                </div>
             </div>
 
             <!-- PEOPLE DROPDOWN -->
@@ -48,10 +68,18 @@
                 </select>
             </div>
 
-            <!-- ID PROOF -->
+            <!-- ✅ UPDATED AADHAR -->
             <div class="mb-2">
-                <label>ID Proof</label>
-                <input type="text" name="id_proof" class="form-control" required>
+                <label>Aadhar Card Number</label>
+                <input 
+                    type="text" 
+                    name="id_proof" 
+                    class="form-control"
+                    placeholder="Enter 12 digit Aadhar number"
+                    pattern="[0-9]{12}"
+                    maxlength="12"
+                    required
+                >
             </div>
 
             <button class="btn btn-success w-100 mt-3">

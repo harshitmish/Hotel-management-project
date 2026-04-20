@@ -19,5 +19,6 @@ urlpatterns = [
     path('room/<int:room_id>/', views.room_detail, name='room_detail'),
     path('book-details/', views.book_details, name='book_details'),
     path('booking-summary/', views.booking_summary, name='booking_summary'),
+    path('download-pdf/<int:booking_id>/', views.download_booking_pdf, name='download_pdf'),
 ]
 

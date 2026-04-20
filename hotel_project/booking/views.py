@@ -10,7 +10,78 @@ from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Avg
 from django.http import JsonResponse
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import letter
+from django.http import HttpResponse
 
+
+@login_required
+def download_booking_pdf(request, booking_id):
+    booking = Booking.objects.get(id=booking_id, user=request.user)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{booking.id}.pdf"'
+
+    doc = SimpleDocTemplate(response, pagesize=letter)
+    styles = getSampleStyleSheet()
+
+    elements = []
+
+    # 🧾 TITLE
+    elements.append(Paragraph("HOTEL INVOICE", styles['Title']))
+    elements.append(Spacer(1, 20))
+
+    # 🧑 CUSTOMER DETAILS
+    elements.append(Paragraph(f"<b>Name:</b> {booking.name}", styles['Normal']))
+    elements.append(Paragraph(f"<b>Phone:</b> {booking.phone}", styles['Normal']))
+    elements.append(Spacer(1, 20))
+
+    # 🏨 BOOKING DETAILS TABLE
+    data = [
+        ["Field", "Details"],
+        ["Room", booking.room.name],
+        ["Check-in", str(booking.check_in)],
+        ["Check-out", str(booking.check_out)],
+        ["Total People", str(booking.total_people)],
+        ["Status", booking.status],
+    ]
+
+    table = Table(data, colWidths=[150, 250])
+
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+
+        ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
+    ]))
+
+    elements.append(table)
+    elements.append(Spacer(1, 30))
+
+    # 💰 PRICE (simple example)
+    price = booking.room.price
+    nights = (booking.check_out - booking.check_in).days
+    total = price * nights
+
+    elements.append(Paragraph(f"<b>Price per Night:</b> ₹{price}", styles['Normal']))
+    elements.append(Paragraph(f"<b>Total Nights:</b> {nights}", styles['Normal']))
+    elements.append(Paragraph(f"<b>Total Amount:</b> ₹{total}", styles['Heading2']))
+
+    elements.append(Spacer(1, 40))
+
+    # 📝 FOOTER
+    elements.append(Paragraph("Thank you for booking with us!", styles['Italic']))
+
+    doc.build(elements)
+
+    return response
 
 # 🔐 FORGOT PASSWORD
 def forgot_password(request):
@@ -62,10 +133,10 @@ def reset_password(request, uidb64, token):
     return render(request, 'booking/reset.html')
 
 
-# 📋 MY BOOKINGS (UPDATED SORTING)
+# 📋 MY BOOKINGS
 @login_required
 def my_bookings(request):
-    bookings = Booking.objects.filter(user=request.user).order_by('-created_at')  # ✅ sorted
+    bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'booking/my_bookings.html', {'bookings': bookings})
 
 
@@ -75,7 +146,7 @@ def home(request):
     return render(request, 'booking/home.html', {'rooms': rooms})
 
 
-# 🏨 ROOMS (FILTER + SEARCH + RATING)
+# 🏨 ROOMS
 def rooms(request):
     rooms = Room.objects.all().prefetch_related('reviews')
 
@@ -102,7 +173,7 @@ def rooms(request):
     return render(request, 'booking/rooms.html', {'rooms': rooms})
 
 
-# 📅 STEP 1: DATE SELECT + OVERLAP CHECK (FIXED)
+# 📅 STEP 1
 @login_required
 def book_room(request):
     room_id = request.GET.get('room_id')
@@ -127,7 +198,6 @@ def book_room(request):
             messages.error(request, "Invalid dates ❌")
             return redirect(request.path + f"?room_id={room_id}")
 
-        # 🔥 overlap check (FIXED - ignore cancelled)
         if Booking.objects.filter(
             room=room,
             status='Booked',
@@ -145,7 +215,7 @@ def book_room(request):
     return render(request, 'booking/select_date.html', {'room': room})
 
 
-# 📅 STEP 2: DETAILS + VALIDATION
+# 📅 STEP 2 (UPDATED)
 @login_required
 def book_details(request):
     room_id = request.GET.get('room_id')
@@ -165,7 +235,22 @@ def book_details(request):
 
     if request.method == 'POST':
         name = request.POST.get('name')
+
+        # 📞 PHONE
+        country_code = request.POST.get('country_code')
         phone = request.POST.get('phone')
+        phone = f"{country_code}{phone}"
+
+        if not phone or not phone.replace("+", "").isdigit():
+            messages.error(request, "Invalid phone number ❌")
+            return redirect(request.path + f"?room_id={room_id}")
+
+        # 🆔 AADHAR
+        id_proof = request.POST.get('id_proof')
+        if not id_proof or not id_proof.isdigit() or len(id_proof) != 12:
+            messages.error(request, "Aadhar must be 12 digits ❌")
+            return redirect(request.path + f"?room_id={room_id}")
+
         people = request.POST.get('people')
 
         if not people:
@@ -183,7 +268,7 @@ def book_details(request):
             'name': name,
             'phone': phone,
             'people': people,
-            'id_proof': request.POST.get('id_proof'),
+            'id_proof': id_proof,
             'check_in': check_in,
             'check_out': check_out
         }
@@ -197,7 +282,7 @@ def book_details(request):
     })
 
 
-# 📝 SIGNUP (FULL VALIDATION)
+# 📝 SIGNUP
 def signup(request):
     if request.method == 'POST':
         email = request.POST.get('email').strip().lower()
@@ -223,7 +308,7 @@ def signup(request):
     return render(request, 'booking/signup.html')
 
 
-# 🔐 LOGIN (FIXED)
+# 🔐 LOGIN
 def user_login(request):
     if request.method == 'POST':
         email = request.POST.get('username').strip().lower()
@@ -249,7 +334,7 @@ def user_logout(request):
     return redirect('login')
 
 
-# ❌ CANCEL BOOKING (FIXED - NO DELETE)
+# ❌ CANCEL BOOKING
 @login_required
 def cancel_booking(request, booking_id):
     booking = Booking.objects.filter(id=booking_id, user=request.user).first()
@@ -258,7 +343,7 @@ def cancel_booking(request, booking_id):
         messages.error(request, "Unauthorized ❌")
         return redirect('my_bookings')
 
-    booking.status = 'Cancelled'  # ✅ FIX
+    booking.status = 'Cancelled'
     booking.save()
 
     messages.success(request, "Cancelled ❌")
@@ -326,7 +411,7 @@ def booking_summary(request):
     })
 
 
-#chatbot
+# 🤖 CHATBOT (UNCHANGED)
 def chatbot(request):
     msg = request.GET.get("message", "").lower()
 
@@ -354,22 +439,16 @@ def chatbot(request):
                 room = Room.objects.get(id=room_id)
 
                 if room.capacity >= num:
-                    return JsonResponse({
-                        "reply": f"{room.name} is perfect for {num} people 👍"
-                    })
+                    return JsonResponse({"reply": f"{room.name} is perfect for {num} people 👍"})
                 else:
-                    return JsonResponse({
-                        "reply": f"{room.name} is too small ❌ Try bigger room"
-                    })
+                    return JsonResponse({"reply": f"{room.name} is too small ❌ Try bigger room"})
 
             rooms = Room.objects.filter(capacity__gte=num)
             names = ", ".join([r.name for r in rooms])
 
             request.session["last_intent"] = "people"
 
-            return JsonResponse({
-                "reply": f"Rooms for {num} people: {names}"
-            })
+            return JsonResponse({"reply": f"Rooms for {num} people: {names}"})
 
         except:
             return JsonResponse({"reply": "Try: 2 people"})
@@ -390,9 +469,7 @@ def chatbot(request):
 
             request.session["last_intent"] = "price"
 
-            return JsonResponse({
-                "reply": f"Rooms under ₹{price}: {names}"
-            })
+            return JsonResponse({"reply": f"Rooms under ₹{price}: {names}"})
 
         except:
             return JsonResponse({"reply": "Try: under 3000"})

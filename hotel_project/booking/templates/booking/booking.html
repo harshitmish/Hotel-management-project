@@ -34,57 +34,6 @@
         {% endfor %}
     {% endif %}
 
-    <!-- 🔥 SELECTED ROOM FORM -->
-    {% if room %}
-    <div class="card p-4 mb-4">
-        <h4 class="text-center mb-3">Booking for {{ room.name }}</h4>
-
-        <form method="POST">
-            {% csrf_token %}
-
-            <input type="hidden" name="room" value="{{ room.id }}">
-            <input type="hidden" name="check_in" value="{{ check_in }}">
-            <input type="hidden" name="check_out" value="{{ check_out }}">
-
-            <div class="mb-2">
-                <label>Name</label>
-                <input type="text" name="name" class="form-control" required>
-            </div>
-
-            <div class="mb-2">
-                <label>Phone</label>
-                <input type="text" name="phone" class="form-control" required>
-            </div>
-
-            <div class="mb-2">
-                <label>ID Proof</label>
-                <input type="text" name="id_proof" class="form-control" required>
-            </div>
-
-            <!-- 🔥 PEOPLE DROPDOWN -->
-            <div class="mb-2">
-                <label>Total People</label>
-
-                <select name="total_people" class="form-control" required>
-                    <option value="">Select People</option>
-
-                    {% for i in people_range %}
-                        <option value="{{ i }}">
-                            {{ i }} Person{% if i > 1 %}s{% endif %}
-                        </option>
-                    {% endfor %}
-
-                </select>
-            </div>
-
-            <button class="btn btn-success mt-3 w-100">
-                Confirm Booking
-            </button>
-
-        </form>
-    </div>
-    {% endif %}
-
     <!-- 🔥 ROOMS -->
     <div class="row">
 
@@ -94,7 +43,9 @@
             <div class="card shadow-sm h-100">
 
                 {% if room.images.first %}
-                <img src="{{ room.images.first.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;">
+                <img src="{{ room.images.first.image.url }}" 
+                     class="card-img-top" 
+                     style="height:200px; object-fit:cover;">
                 {% endif %}
 
                 <div class="card-body text-center">
@@ -102,7 +53,8 @@
                     <p>₹{{ room.price }} / night</p>
 
                     <!-- 🔥 BOOK BUTTON -->
-                    <a href="{% url 'room_detail' room.id %}" class="btn btn-danger w-100">
+                    <a href="{% url 'book_room' %}?room_id={{ room.id }}" 
+                       class="btn btn-danger w-100">
                         Book Now
                     </a>
 

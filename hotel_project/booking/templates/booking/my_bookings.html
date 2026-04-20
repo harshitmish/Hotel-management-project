@@ -22,6 +22,7 @@
                 <th>Dates</th>
                 <th>Status</th> <!-- ✅ NEW -->
                 <th>Action</th>
+                <th>PDF</th>
             </tr>
         </thead>
 
@@ -50,9 +51,13 @@
                             Cancel
                         </a>
                     {% else %}
-                        <span class="text-muted">No Action</span>
+                    <span class="text-muted"></span>
                     {% endif %}
                 </td>
+                <td>
+                    <a href="{% url 'download_pdf' booking.id %}" class="btn btn-primary btn-sm">
+    Download PDF
+</a></td>
             </tr>
             {% empty %}
             <tr>
