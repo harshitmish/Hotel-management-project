@@ -83,7 +83,11 @@ class RoomImageAdmin(admin.ModelAdmin):
         if obj.image:
             return format_html('<img src="{}" width="60" style="border-radius:8px;" />', obj.image.url)
         return "No Image"
-
+        
+@admin.register(Booking)
+class BookingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'room', 'check_in', 'check_out', 'status', 'created_at')
+    list_filter = ('status',)
 
 # 🔥 REGISTER
 admin_site.register(Room, RoomAdmin)

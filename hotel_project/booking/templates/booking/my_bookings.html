@@ -20,6 +20,7 @@
             <tr>
                 <th>Room</th>
                 <th>Dates</th>
+                <th>Status</th> <!-- ✅ NEW -->
                 <th>Action</th>
             </tr>
         </thead>
@@ -34,15 +35,28 @@
                     <b>Check-out:</b> {{ booking.check_out }}
                 </td>
 
+                <!-- ✅ NEW STATUS COLUMN -->
                 <td>
-                    <a href="{% url 'cancel_booking' booking.id %}" class="btn btn-danger btn-sm">
-                        Cancel
-                    </a>
+                    {% if booking.status == "Booked" %}
+                        <span class="text-success">Booked</span>
+                    {% else %}
+                        <span class="text-danger">Cancelled</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if booking.status == "Booked" %}
+                        <a href="{% url 'cancel_booking' booking.id %}" class="btn btn-danger btn-sm">
+                            Cancel
+                        </a>
+                    {% else %}
+                        <span class="text-muted">No Action</span>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="3" class="text-center">No bookings yet</td>
+                <td colspan="4" class="text-center">No bookings yet</td> <!-- updated colspan -->
             </tr>
             {% endfor %}
         </tbody>

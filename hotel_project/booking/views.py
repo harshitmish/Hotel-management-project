@@ -62,10 +62,10 @@ def reset_password(request, uidb64, token):
     return render(request, 'booking/reset.html')
 
 
-# 📋 MY BOOKINGS
+# 📋 MY BOOKINGS (UPDATED SORTING)
 @login_required
 def my_bookings(request):
-    bookings = Booking.objects.filter(user=request.user)
+    bookings = Booking.objects.filter(user=request.user).order_by('-created_at')  # ✅ sorted
     return render(request, 'booking/my_bookings.html', {'bookings': bookings})
 
 
@@ -102,7 +102,7 @@ def rooms(request):
     return render(request, 'booking/rooms.html', {'rooms': rooms})
 
 
-# 📅 STEP 1: DATE SELECT + OVERLAP CHECK
+# 📅 STEP 1: DATE SELECT + OVERLAP CHECK (FIXED)
 @login_required
 def book_room(request):
     room_id = request.GET.get('room_id')
@@ -127,9 +127,10 @@ def book_room(request):
             messages.error(request, "Invalid dates ❌")
             return redirect(request.path + f"?room_id={room_id}")
 
-        # 🔥 overlap check
+        # 🔥 overlap check (FIXED - ignore cancelled)
         if Booking.objects.filter(
             room=room,
+            status='Booked',
             check_in__lt=check_out,
             check_out__gt=check_in
         ).exists():
@@ -248,7 +249,7 @@ def user_logout(request):
     return redirect('login')
 
 
-# ❌ CANCEL BOOKING (SAFE)
+# ❌ CANCEL BOOKING (FIXED - NO DELETE)
 @login_required
 def cancel_booking(request, booking_id):
     booking = Booking.objects.filter(id=booking_id, user=request.user).first()
@@ -257,7 +258,9 @@ def cancel_booking(request, booking_id):
         messages.error(request, "Unauthorized ❌")
         return redirect('my_bookings')
 
-    booking.delete()
+    booking.status = 'Cancelled'  # ✅ FIX
+    booking.save()
+
     messages.success(request, "Cancelled ❌")
     return redirect('my_bookings')
 
@@ -322,6 +325,7 @@ def booking_summary(request):
         'data': data
     })
 
+
 #chatbot
 def chatbot(request):
     msg = request.GET.get("message", "").lower()
@@ -329,10 +333,8 @@ def chatbot(request):
     if not msg:
         return JsonResponse({"reply": "Hello..."})
 
-    # 🔥 memory get
     last_intent = request.session.get("last_intent")
 
-    # 🔥 CHEAP / BEST
     if "cheap" in msg or "best" in msg:
         room = Room.objects.order_by('price').first()
 
@@ -343,12 +345,10 @@ def chatbot(request):
 
         return JsonResponse({"reply": "No rooms"})
 
-    # 🔥 PEOPLE (SMART MEMORY)
     elif "people" in msg:
         try:
             num = int(''.join(filter(str.isdigit, msg)))
 
-            # 🔥 agar pehle cheap search kiya tha
             if last_intent == "cheap":
                 room_id = request.session.get("last_room")
                 room = Room.objects.get(id=room_id)
@@ -362,7 +362,6 @@ def chatbot(request):
                         "reply": f"{room.name} is too small ❌ Try bigger room"
                     })
 
-            # 🔥 normal flow
             rooms = Room.objects.filter(capacity__gte=num)
             names = ", ".join([r.name for r in rooms])
 
@@ -375,7 +374,6 @@ def chatbot(request):
         except:
             return JsonResponse({"reply": "Try: 2 people"})
 
-    # 🔥 AC
     elif "ac" in msg:
         rooms = Room.objects.filter(room_type="AC")
         names = ", ".join([r.name for r in rooms])
@@ -384,7 +382,6 @@ def chatbot(request):
 
         return JsonResponse({"reply": f"AC Rooms: {names}"})
 
-    # 🔥 PRICE UNDER
     elif "under" in msg:
         try:
             price = int(''.join(filter(str.isdigit, msg)))
@@ -400,13 +397,11 @@ def chatbot(request):
         except:
             return JsonResponse({"reply": "Try: under 3000"})
 
-    # 🔥 FOLLOW-UP SMARTNESS
     elif "book" in msg and last_intent:
         return JsonResponse({
             "reply": "You can go to Rooms → select your last searched room → Book Now"
         })
 
-    # 🔥 DEFAULT
     return JsonResponse({
         "reply": "Try: cheap room, AC, under 3000, 2 people"
     })
