@@ -412,17 +412,14 @@ def resend_otp(request):
     otp = str(random.randint(100000, 999999))
     OTP.objects.create(email=email, otp=otp)
 
-    # ✅ SAFE EMAIL SEND
-    try:
-        send_mail(
-            'Resent OTP',
-            f'Your new OTP is {otp}',
-            settings.EMAIL_HOST_USER,
-            [email],
-            fail_silently=True   # 🔥 VERY IMPORTANT
-        )
-    except Exception as e:
-        print("Email error:", e)
+    # 🔥 DEBUG MODE (no try-catch)
+    send_mail(
+        'Resent OTP',
+        f'Your new OTP is {otp}',
+        settings.EMAIL_HOST_USER,
+        [email],
+        fail_silently=False
+    )
 
     messages.success(request, "OTP resent 📩")
     return redirect('verify_otp')
