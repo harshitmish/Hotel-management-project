@@ -1,12 +1,17 @@
 from django.urls import path
 from . import views
-from hotel_project.booking.admin import admin_site
+from django.contrib import admin   # ✅ ye use karo
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('rooms/', views.rooms, name='rooms'),
     path('book/', views.book_room, name='book_room'),
-    path('admin/', admin_site.urls),
+
+    # ✅ FIXED
+    path('admin/', admin.site.urls),
+
     path('chatbot/', views.chatbot, name='chatbot'),
+
     # authentication
     path('signup/', views.signup, name='signup'),
     path('login/', views.user_login, name='login'),
@@ -21,4 +26,3 @@ urlpatterns = [
     path('booking-summary/', views.booking_summary, name='booking_summary'),
     path('download-pdf/<int:booking_id>/', views.download_booking_pdf, name='download_pdf'),
 ]
-
