@@ -92,12 +92,20 @@
             <hr>
 
             <!-- 🔥 CONFIRM BUTTON -->
-            <form method="POST">
-                {% csrf_token %}
-                <button class="btn confirm-btn w-100">
-                    ✅ Confirm Booking
-                </button>
-            </form>
+            <form method="POST" onsubmit="disableBtn()" class="text-center">
+    {% csrf_token %}
+
+    <button type="submit" id="bookBtn" class="btn btn-success confirm-btn">
+        Confirm Booking
+    </button>
+</form>
+
+<script>
+function disableBtn() {
+    document.getElementById("bookBtn").disabled = true;
+    document.getElementById("bookBtn").innerText = "Processing...";
+}
+</script>
 
         </div>
 

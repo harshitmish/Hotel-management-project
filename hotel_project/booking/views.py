@@ -14,7 +14,47 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import letter
+from django.core.mail import send_mail
 from django.http import HttpResponse
+import random
+from django.conf import settings
+from .models import OTP
+from datetime import timedelta
+from django.utils import timezone
+from django.core.mail import EmailMessage
+from io import BytesIO
+
+def generate_pdf(booking):
+    buffer = BytesIO()
+
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+
+    elements = []
+
+    elements.append(Paragraph("HOTEL INVOICE", styles['Title']))
+    elements.append(Spacer(1, 20))
+
+    elements.append(Paragraph(f"Name: {booking.name}", styles['Normal']))
+    elements.append(Paragraph(f"Phone: {booking.phone}", styles['Normal']))
+    elements.append(Spacer(1, 20))
+
+    data = [
+        ["Room", booking.room.name],
+        ["Check-in", str(booking.check_in)],
+        ["Check-out", str(booking.check_out)],
+        ["People", str(booking.total_people)],
+    ]
+
+    table = Table(data)
+    elements.append(table)
+
+    doc.build(elements)
+
+    pdf = buffer.getvalue()
+    buffer.close()
+
+    return pdf
 
 
 @login_required
@@ -282,7 +322,6 @@ def book_details(request):
     })
 
 
-# 📝 SIGNUP
 def signup(request):
     if request.method == 'POST':
         email = request.POST.get('email').strip().lower()
@@ -301,12 +340,81 @@ def signup(request):
             messages.error(request, "Already registered ❌")
             return redirect('signup')
 
-        User.objects.create_user(username=email, email=email, password=password)
-        messages.success(request, "Account created 🎉")
-        return redirect('login')
+        # 🔥 OTP generate
+        otp = str(random.randint(100000, 999999))
+
+        # DB me save
+        OTP.objects.create(email=email, otp=otp)
+
+        # 📩 Email send
+        send_mail(
+            'Your OTP Code',
+            f'Your OTP is {otp}',
+            settings.EMAIL_HOST_USER,
+            [email],
+            fail_silently=False
+        )
+
+        # 🔐 session save
+        request.session['email'] = email
+        request.session['password'] = password
+
+        messages.success(request, "OTP sent to your email 📩")
+        return redirect('verify_otp')   # 👈 IMPORTANT
 
     return render(request, 'booking/signup.html')
 
+
+def verify_otp(request):
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        email = request.session.get('email')
+        password = request.session.get('password')
+
+        otp_obj = OTP.objects.filter(email=email).last()
+
+        if otp_obj:
+            # ⏰ EXPIRY CHECK (5 min)
+            if timezone.now() > otp_obj.created_at + timedelta(minutes=5):
+                otp_obj.delete()
+                messages.error(request, "OTP expired ❌")
+                return redirect('signup')
+
+            if otp_obj.otp == entered_otp:
+                User.objects.create_user(username=email, email=email, password=password)
+
+                otp_obj.delete()
+                del request.session['email']
+                del request.session['password']
+
+                messages.success(request, "Account created 🎉")
+                return redirect('login')
+
+        messages.error(request, "Invalid OTP ❌")
+
+    return render(request, 'booking/verify_otp.html')
+
+
+def resend_otp(request):
+    email = request.session.get('email')
+
+    if not email:
+        return redirect('signup')
+
+    otp = str(random.randint(100000, 999999))
+
+    OTP.objects.create(email=email, otp=otp)
+
+    send_mail(
+        'Resent OTP',
+        f'Your new OTP is {otp}',
+        settings.EMAIL_HOST_USER,
+        [email],
+        fail_silently=False
+    )
+
+    messages.success(request, "OTP resent 📩")
+    return redirect('verify_otp')
 
 # 🔐 LOGIN
 def user_login(request):
@@ -346,9 +454,28 @@ def cancel_booking(request, booking_id):
     booking.status = 'Cancelled'
     booking.save()
 
+    # 📩 EMAIL SEND (CANCEL)
+
+    send_mail(
+        'Booking Cancelled ❌',
+        f'''
+Hello {request.user.username},
+
+Your booking has been cancelled ❌
+
+Room: {booking.room.name}
+Check-in: {booking.check_in}
+Check-out: {booking.check_out}
+
+If this was not you, contact support.
+''',
+        settings.EMAIL_HOST_USER,
+        [request.user.email],
+        fail_silently=False
+    )
+
     messages.success(request, "Cancelled ❌")
     return redirect('my_bookings')
-
 
 # ⭐ REVIEW
 @login_required
@@ -390,7 +517,23 @@ def booking_summary(request):
     room = Room.objects.get(id=data['room_id'])
 
     if request.method == 'POST':
-        Booking.objects.create(
+
+        # ================================
+        # 🔒 DUPLICATE BOOKING PROTECTION (NEW ADD)
+        # ================================
+        if Booking.objects.filter(
+            user=request.user,
+            room=room,
+            check_in=data['check_in'],
+            check_out=data['check_out'],
+            status='Booked'
+        ).exists():
+            messages.error(request, "Already booked ❌")
+            return redirect('my_bookings')
+        # ================================
+
+
+        booking = Booking.objects.create(
             user=request.user,
             room=room,
             name=data['name'],
@@ -401,6 +544,77 @@ def booking_summary(request):
             check_out=data['check_out']
         )
 
+        # 📩 NORMAL EMAIL (UNCHANGED)
+        send_mail(
+            'Booking Confirmed ✅',
+            f'''
+Hello {request.user.username},
+
+Your booking is confirmed 🎉
+
+Room: {room.name}
+Check-in: {data['check_in']}
+Check-out: {data['check_out']}
+People: {data['people']}
+
+Thank you for choosing us!
+''',
+            settings.EMAIL_HOST_USER,
+            [request.user.email],
+            fail_silently=False
+        )
+
+        # ================================
+        # 📄 PDF ATTACH EMAIL (UNCHANGED)
+        # ================================
+        from django.core.mail import EmailMessage
+        from io import BytesIO
+
+        buffer = BytesIO()
+
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+        styles = getSampleStyleSheet()
+
+        elements = []
+
+        elements.append(Paragraph("HOTEL INVOICE", styles['Title']))
+        elements.append(Spacer(1, 20))
+
+        elements.append(Paragraph(f"Name: {booking.name}", styles['Normal']))
+        elements.append(Paragraph(f"Phone: {booking.phone}", styles['Normal']))
+        elements.append(Spacer(1, 20))
+
+        data_table = [
+            ["Room", booking.room.name],
+            ["Check-in", str(booking.check_in)],
+            ["Check-out", str(booking.check_out)],
+            ["People", str(booking.total_people)],
+        ]
+
+        table = Table(data_table)
+        elements.append(table)
+
+        doc.build(elements)
+
+        pdf = buffer.getvalue()
+        buffer.close()
+
+        email = EmailMessage(
+            'Booking Invoice 📄',
+            'Your booking invoice is attached.',
+            settings.EMAIL_HOST_USER,
+            [request.user.email],
+        )
+
+        email.attach(
+            f"invoice_{booking.id}.pdf",
+            pdf,
+            'application/pdf'
+        )
+
+        email.send(fail_silently=False)
+        # ================================
+
         del request.session['booking_data']
         messages.success(request, "Booking confirmed 🎉")
         return redirect('my_bookings')
@@ -409,7 +623,6 @@ def booking_summary(request):
         'room': room,
         'data': data
     })
-
 
 # 🤖 CHATBOT (UNCHANGED)
 def chatbot(request):
