@@ -26,5 +26,6 @@ urlpatterns = [
     path('booking-summary/', views.booking_summary, name='booking_summary'),
     path('download-pdf/<int:booking_id>/', views.download_booking_pdf, name='download_pdf'),
     path('verify-otp/', views.verify_otp, name='verify_otp'),
+    path('resend-otp/', views.resend_otp, name='resend_otp'),
 
 ]
