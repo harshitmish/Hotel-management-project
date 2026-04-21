@@ -413,13 +413,13 @@ def resend_otp(request):
 
     OTP.objects.create(email=email, otp=otp)
 
-    send_mail(
-        'Resent OTP',
-        f'Your new OTP is {otp}',
-        settings.EMAIL_HOST_USER,
-        [email],
-        fail_silently=False
-    )
+    #send_mail(
+        #'Resent OTP',
+        #f'Your new OTP is {otp}',
+        #settings.EMAIL_HOST_USER,
+       # [email],
+       # fail_silently=False
+    #)
 
     messages.success(request, "OTP resent 📩")
     return redirect('verify_otp')
