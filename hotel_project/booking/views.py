@@ -347,13 +347,18 @@ def signup(request):
         OTP.objects.create(email=email, otp=otp)
 
         # 📩 Email send
-        send_mail(
-            'Your OTP Code',
-            f'Your OTP is {otp}',
-            settings.EMAIL_HOST_USER,
-            [email],
-            fail_silently=False
-        )
+        from django.core.mail import send_mail
+
+        try:
+            send_mail(
+                'Your OTP Code',
+                f'Your OTP is {otp}',
+                settings.EMAIL_HOST_USER,
+                [email],
+                fail_silently=True   # 🔥 MUST
+            )
+        except Exception as e:
+            print("Email error:", e)
 
         # 🔐 session save
         request.session['email'] = email
@@ -363,36 +368,6 @@ def signup(request):
         return redirect('verify_otp')   # 👈 IMPORTANT
 
     return render(request, 'booking/signup.html')
-
-
-def verify_otp(request):
-    if request.method == 'POST':
-        entered_otp = request.POST.get('otp')
-        email = request.session.get('email')
-        password = request.session.get('password')
-
-        otp_obj = OTP.objects.filter(email=email).last()
-
-        if otp_obj:
-            # ⏰ EXPIRY CHECK (5 min)
-            if timezone.now() > otp_obj.created_at + timedelta(minutes=5):
-                otp_obj.delete()
-                messages.error(request, "OTP expired ❌")
-                return redirect('signup')
-
-            if otp_obj.otp == entered_otp:
-                User.objects.create_user(username=email, email=email, password=password)
-
-                otp_obj.delete()
-                del request.session['email']
-                del request.session['password']
-
-                messages.success(request, "Account created 🎉")
-                return redirect('login')
-
-        messages.error(request, "Invalid OTP ❌")
-
-    return render(request, 'booking/verify_otp.html')
 
 
 def resend_otp(request):
