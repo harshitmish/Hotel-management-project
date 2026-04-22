@@ -1,5 +1,5 @@
 {% extends 'booking/base.html' %}
-
+{% load socialaccount %}
 {% block content %}
 
 <div class="container d-flex justify-content-center align-items-center" style="height:90vh;">
@@ -24,7 +24,7 @@
             <button type="submit" class="btn btn-primary w-100">Login</button>
 
         </form>
-
+        
         <!-- Error -->
         {% if error %}
         <div class="alert alert-danger text-center mt-3">
@@ -42,6 +42,12 @@
             Don't have an account? 
             <a href="{% url 'signup' %}">Signup</a>
         </p>
+
+        <a href="{% provider_login_url 'google' process='login' %}" 
+   style="display:block; text-align:center; background:#db4437; color:white; padding:10px; border-radius:5px; text-decoration:none; font-weight:bold;">
+    
+    Login with Google 🚀
+</a>
 <div class="text-center mt-2">
     <a href="{% url 'forgot_password' %}">Forgot Password?</a>
 </div>

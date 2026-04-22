@@ -1,16 +1,13 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
-from django.contrib import admin   # ✅ ye use karo
 
 urlpatterns = [
     path('', views.home, name='home'),
     path('rooms/', views.rooms, name='rooms'),
     path('book/', views.book_room, name='book_room'),
 
-    # ✅ FIXED
-    path('admin/', admin.site.urls),
-
     path('chatbot/', views.chatbot, name='chatbot'),
+    path('accounts/', include('allauth.urls')),
 
     # authentication
     path('signup/', views.signup, name='signup'),
