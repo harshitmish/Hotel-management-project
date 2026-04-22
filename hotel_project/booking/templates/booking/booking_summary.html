@@ -124,14 +124,38 @@ document.getElementById("pay-btn").onclick = function (e) {
             "currency": "INR",
             "order_id": data.order_id,
 
-            "redirect": false,   // 🔥 MOST IMPORTANT FIX (blank page solve)
+            "redirect": false,   // ✅ blank page fix
 
             "handler": function (response){
 
                 console.log("Payment success:", response);
 
-                alert("Payment Successful 🎉");
-                window.location.href = "/my-bookings/";
+                // ✅ 🔥 IMPORTANT: backend call
+                fetch("/verify-payment/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify(response)
+                })
+                .then(res => res.json())
+                .then(data => {
+
+                    console.log("Verify:", data);
+
+                    if(data.status === "success"){
+                        alert("Payment Successful 🎉");
+                        window.location.href = "/my-bookings/";
+                    } else {
+                        alert("Booking failed ❌");
+                    }
+
+                })
+                .catch(err => {
+                    console.error("Verify error:", err);
+                    alert("Something went wrong ❌");
+                });
 
             },
 

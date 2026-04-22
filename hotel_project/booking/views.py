@@ -22,12 +22,37 @@ from django.utils import timezone
 import razorpay
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-
+import json
 
 @csrf_exempt
 @login_required
 def verify_payment(request):
-    return JsonResponse({"status": "success"})
+    if request.method == "POST":
+        data = request.session.get('booking_data')
+
+        if not data:
+            return JsonResponse({"status": "failed"})
+
+        room = Room.objects.get(id=data['room_id'])
+
+        # ✅ booking create
+        Booking.objects.create(
+            user=request.user,
+            room=room,
+            name=data['name'],
+            phone=data['phone'],
+            total_people=data['people'],
+            id_proof=data['id_proof'],
+            check_in=data['check_in'],
+            check_out=data['check_out']
+        )
+
+        # session clear
+        del request.session['booking_data']
+
+        return JsonResponse({"status": "success"})
+
+    return JsonResponse({"status": "failed"})
 
 
 def generate_pdf(booking):
