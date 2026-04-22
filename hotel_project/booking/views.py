@@ -14,7 +14,6 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import letter
-from django.core.mail import send_mail
 from django.http import HttpResponse
 import random
 from django.conf import settings
@@ -392,27 +391,9 @@ def cancel_booking(request, booking_id):
     booking.status = 'Cancelled'
     booking.save()
 
-    # 📩 EMAIL SEND (CANCEL)
+    # ❌ EMAIL REMOVED (FIXED)
 
-    send_mail(
-        'Booking Cancelled ❌',
-        f'''
-Hello {request.user.username},
-
-Your booking has been cancelled ❌
-
-Room: {booking.room.name}
-Check-in: {booking.check_in}
-Check-out: {booking.check_out}
-
-If this was not you, contact support.
-''',
-        settings.EMAIL_HOST_USER,
-        [request.user.email],
-        fail_silently=False
-    )
-
-    messages.success(request, "Cancelled ❌")
+    messages.success(request, "Booking cancelled successfully ✅")
     return redirect('my_bookings')
 
 # ⭐ REVIEW
@@ -456,9 +437,7 @@ def booking_summary(request):
 
     if request.method == 'POST':
 
-        # ================================
-        # 🔒 DUPLICATE BOOKING PROTECTION (NEW ADD)
-        # ================================
+        # 🔒 DUPLICATE CHECK
         if Booking.objects.filter(
             user=request.user,
             room=room,
@@ -468,8 +447,6 @@ def booking_summary(request):
         ).exists():
             messages.error(request, "Already booked ❌")
             return redirect('my_bookings')
-        # ================================
-
 
         booking = Booking.objects.create(
             user=request.user,
@@ -482,78 +459,11 @@ def booking_summary(request):
             check_out=data['check_out']
         )
 
-        # 📩 NORMAL EMAIL (UNCHANGED)
-        send_mail(
-            'Booking Confirmed ✅',
-            f'''
-Hello {request.user.username},
+        # ❌ EMAIL REMOVED (IMPORTANT FIX)
 
-Your booking is confirmed 🎉
-
-Room: {room.name}
-Check-in: {data['check_in']}
-Check-out: {data['check_out']}
-People: {data['people']}
-
-Thank you for choosing us!
-''',
-            settings.EMAIL_HOST_USER,
-            [request.user.email],
-            fail_silently=False
-        )
-
-        # ================================
-        # 📄 PDF ATTACH EMAIL (UNCHANGED)
-        # ================================
-        from django.core.mail import EmailMessage
-        from io import BytesIO
-
-        buffer = BytesIO()
-
-        doc = SimpleDocTemplate(buffer, pagesize=letter)
-        styles = getSampleStyleSheet()
-
-        elements = []
-
-        elements.append(Paragraph("HOTEL INVOICE", styles['Title']))
-        elements.append(Spacer(1, 20))
-
-        elements.append(Paragraph(f"Name: {booking.name}", styles['Normal']))
-        elements.append(Paragraph(f"Phone: {booking.phone}", styles['Normal']))
-        elements.append(Spacer(1, 20))
-
-        data_table = [
-            ["Room", booking.room.name],
-            ["Check-in", str(booking.check_in)],
-            ["Check-out", str(booking.check_out)],
-            ["People", str(booking.total_people)],
-        ]
-
-        table = Table(data_table)
-        elements.append(table)
-
-        doc.build(elements)
-
-        pdf = buffer.getvalue()
-        buffer.close()
-
-        email = EmailMessage(
-            'Booking Invoice 📄',
-            'Your booking invoice is attached.',
-            settings.EMAIL_HOST_USER,
-            [request.user.email],
-        )
-
-        email.attach(
-            f"invoice_{booking.id}.pdf",
-            pdf,
-            'application/pdf'
-        )
-
-        email.send(fail_silently=False)
-        # ================================
-
+        # साफ session
         del request.session['booking_data']
+
         messages.success(request, "Booking confirmed 🎉")
         return redirect('my_bookings')
 
