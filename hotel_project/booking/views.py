@@ -19,6 +19,37 @@ import random
 from django.conf import settings
 from datetime import timedelta
 from django.utils import timezone
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+@login_required
+def verify_payment(request):
+    if request.method == "POST":
+        data = request.session.get('booking_data')
+
+        if not data:
+            return JsonResponse({"status": "failed"})
+
+        room = Room.objects.get(id=data['room_id'])
+
+        # ✅ PAYMENT SUCCESS → अब booking create
+        Booking.objects.create(
+            user=request.user,
+            room=room,
+            name=data['name'],
+            phone=data['phone'],
+            total_people=data['people'],
+            id_proof=data['id_proof'],
+            check_in=data['check_in'],
+            check_out=data['check_out']
+        )
+
+        del request.session['booking_data']
+
+        return JsonResponse({"status": "success"})
+
 
 
 def generate_pdf(booking):
@@ -52,6 +83,35 @@ def generate_pdf(booking):
     buffer.close()
 
     return pdf
+
+@login_required
+def create_payment(request):
+    data = request.session.get('booking_data')
+
+    if not data:
+        return JsonResponse({"error": "No booking data"})
+
+    room = Room.objects.get(id=data['room_id'])
+
+    # 💰 price calculation
+    nights = (datetime.strptime(data['check_out'], "%Y-%m-%d").date() -
+              datetime.strptime(data['check_in'], "%Y-%m-%d").date()).days
+
+    amount = room.price * nights * 100   # paisa में
+
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+    payment = client.order.create({
+        "amount": amount,
+        "currency": "INR",
+        "payment_capture": 1
+    })
+
+    return JsonResponse({
+        "order_id": payment['id'],
+        "amount": amount,
+        "key": settings.RAZORPAY_KEY_ID
+    })
 
 
 @login_required

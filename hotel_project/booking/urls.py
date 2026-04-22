@@ -25,5 +25,6 @@ urlpatterns = [
     path('book-details/', views.book_details, name='book_details'),
     path('booking-summary/', views.booking_summary, name='booking_summary'),
     path('download-pdf/<int:booking_id>/', views.download_booking_pdf, name='download_pdf'),
-
+    path('create-payment/', views.create_payment, name='create_payment'),
+    path('verify-payment/', views.verify_payment, name='verify_payment'),
 ]
