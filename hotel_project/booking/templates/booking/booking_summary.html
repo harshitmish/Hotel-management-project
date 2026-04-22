@@ -124,11 +124,12 @@ document.getElementById("pay-btn").onclick = function (e) {
             "currency": "INR",
             "order_id": data.order_id,
 
+            "redirect": false,   // 🔥 MOST IMPORTANT FIX (blank page solve)
+
             "handler": function (response){
 
                 console.log("Payment success:", response);
 
-                // ✅ NO FETCH → DIRECT REDIRECT (FIX)
                 alert("Payment Successful 🎉");
                 window.location.href = "/my-bookings/";
 

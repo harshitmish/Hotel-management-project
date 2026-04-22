@@ -64,33 +64,25 @@ def generate_pdf(booking):
 
 @login_required
 def create_payment(request):
-    data = request.session.get('booking_data')
 
-    if not data:
-        return JsonResponse({"error": "No booking data"})
+    client = razorpay.Client(auth=(
+        settings.RAZORPAY_KEY_ID,
+        settings.RAZORPAY_KEY_SECRET
+    ))
 
-    room = Room.objects.get(id=data['room_id'])
-
-    # 💰 price calculation
-    nights = (datetime.strptime(data['check_out'], "%Y-%m-%d").date() -
-              datetime.strptime(data['check_in'], "%Y-%m-%d").date()).days
-
-    amount = room.price * nights * 100   # paisa में
-
-    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    amount = 50000   # ₹500 (NOTE: paise में)
 
     payment = client.order.create({
         "amount": amount,
         "currency": "INR",
-        "payment_capture": 1
+        "payment_capture": "1"
     })
 
     return JsonResponse({
-        "order_id": payment['id'],
+        "key": settings.RAZORPAY_KEY_ID,
         "amount": amount,
-        "key": settings.RAZORPAY_KEY_ID
+        "order_id": payment["id"]
     })
-
 
 @login_required
 def download_booking_pdf(request, booking_id):
