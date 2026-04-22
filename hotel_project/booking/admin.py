@@ -9,7 +9,7 @@ from allauth.socialaccount.models import SocialApp
 from django.contrib.sites.models import Site
 
 
-# 🔥 SAFE: admin_site define (taaki crash na ho)
+# 🔥 SAFE: admin_site define (same as default, no conflict)
 admin_site = admin.site
 
 
@@ -47,7 +47,7 @@ class RoomImageAdmin(admin.ModelAdmin):
         return "No Image"
 
 
-# 🔥 REGISTER ALL (default admin)
+# 🔥 REGISTER ALL (ONLY ONCE)
 admin.site.register(Room, RoomAdmin)
 admin.site.register(Booking, BookingAdmin)
 admin.site.register(RoomImage, RoomImageAdmin)
@@ -57,7 +57,7 @@ admin.site.register(SocialApp)
 admin.site.register(Site)
 
 
-# 🔥 DUPLICATE BLOCK (kept but RENAMED so no conflict)
+# 🔥 DUPLICATE BLOCK (safe — NOT registered, no conflict)
 class RoomImageInline2(admin.TabularInline):
     model = RoomImage
     extra = 3
@@ -88,11 +88,6 @@ class RoomImageAdmin2(admin.ModelAdmin):
         return "No Image"
 
 
-# 🔥 REGISTER (safe — admin_site == admin.site)
-admin_site.register(Room, RoomAdmin)
-admin_site.register(Booking, BookingAdmin)
-admin_site.register(RoomImage, RoomImageAdmin)
-
-# 🔥 GOOGLE LOGIN
-admin_site.register(SocialApp)
-admin_site.register(Site)
+# ❌ REMOVED duplicate register (yahi crash ka reason tha)
+# admin_site.register(...)
+# admin_site.register(...)
