@@ -126,33 +126,12 @@ document.getElementById("pay-btn").onclick = function (e) {
 
             "handler": function (response){
 
-                console.log("Payment success:", response);  // ✅ debug
+                console.log("Payment success:", response);
 
-                fetch("/verify-payment/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": "{{ csrf_token }}"
-                    },
-                    body: JSON.stringify(response)
-                })
-                .then(res => res.json())
-                .then(data => {
+                // ✅ NO FETCH → DIRECT REDIRECT (FIX)
+                alert("Payment Successful 🎉");
+                window.location.href = "/my-bookings/";
 
-                    console.log("Verify response:", data); // ✅ debug
-
-                    if(data.status === "success"){
-                        alert("Payment Successful 🎉");
-                        window.location.href = "/my-bookings/";
-                    } else {
-                        alert("Payment verify failed ❌");
-                    }
-
-                })
-                .catch(err => {
-                    console.error("Verify error:", err);
-                    alert("Something went wrong ❌");
-                });
             },
 
             "modal": {
