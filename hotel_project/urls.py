@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from hotel_project.booking.admin import admin_site
 
 urlpatterns = [
-    path('admin/', admin.site.urls),   
+    path('admin/', admin_site.urls),   # ✅ yaha change
     path('', include('hotel_project.booking.urls')),
 ]
 
