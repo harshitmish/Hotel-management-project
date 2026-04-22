@@ -26,8 +26,7 @@ from io import BytesIO
 import threading
 
 def send_email_async(subject, message, to_email):
-    from django.core.mail import send_mail
-    from django.conf import settings
+    print("🔥 TRYING TO SEND EMAIL TO:", to_email)
 
     try:
         send_mail(
@@ -37,8 +36,9 @@ def send_email_async(subject, message, to_email):
             [to_email],
             fail_silently=False
         )
+        print("✅ EMAIL SENT SUCCESS")
     except Exception as e:
-        print("EMAIL ERROR:", e)
+        print("❌ EMAIL ERROR:", e)
 
 
 def generate_pdf(booking):
