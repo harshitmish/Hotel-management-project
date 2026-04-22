@@ -52,10 +52,6 @@ admin.site.register(Room, RoomAdmin)
 admin.site.register(Booking, BookingAdmin)
 admin.site.register(RoomImage, RoomImageAdmin)
 
-# 🔥 GOOGLE LOGIN
-admin.site.register(SocialApp)
-admin.site.register(Site)
-
 
 # 🔥 DUPLICATE BLOCK (safe — NOT registered, no conflict)
 class RoomImageInline2(admin.TabularInline):
