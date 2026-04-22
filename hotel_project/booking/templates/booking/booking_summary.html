@@ -125,6 +125,9 @@ document.getElementById("pay-btn").onclick = function (e) {
             "order_id": data.order_id,
 
             "handler": function (response){
+
+                console.log("Payment success:", response);  // ✅ debug
+
                 fetch("/verify-payment/", {
                     method: "POST",
                     headers: {
@@ -135,10 +138,27 @@ document.getElementById("pay-btn").onclick = function (e) {
                 })
                 .then(res => res.json())
                 .then(data => {
+
+                    console.log("Verify response:", data); // ✅ debug
+
                     if(data.status === "success"){
+                        alert("Payment Successful 🎉");
                         window.location.href = "/my-bookings/";
+                    } else {
+                        alert("Payment verify failed ❌");
                     }
+
+                })
+                .catch(err => {
+                    console.error("Verify error:", err);
+                    alert("Something went wrong ❌");
                 });
+            },
+
+            "modal": {
+                "ondismiss": function(){
+                    console.log("Payment popup closed");
+                }
             },
 
             "theme": {

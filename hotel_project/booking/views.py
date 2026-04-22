@@ -27,29 +27,35 @@ from django.views.decorators.csrf import csrf_exempt
 @login_required
 def verify_payment(request):
     if request.method == "POST":
-        data = request.session.get('booking_data')
+        try:
+            data = request.session.get('booking_data')
 
-        if not data:
-            return JsonResponse({"status": "failed"})
+            if not data:
+                return JsonResponse({"status": "failed", "error": "No session data"})
 
-        room = Room.objects.get(id=data['room_id'])
+            room = Room.objects.get(id=data['room_id'])
 
-        # ✅ PAYMENT SUCCESS → अब booking create
-        Booking.objects.create(
-            user=request.user,
-            room=room,
-            name=data['name'],
-            phone=data['phone'],
-            total_people=data['people'],
-            id_proof=data['id_proof'],
-            check_in=data['check_in'],
-            check_out=data['check_out']
-        )
+            # ✅ Booking create
+            Booking.objects.create(
+                user=request.user,
+                room=room,
+                name=data['name'],
+                phone=data['phone'],
+                total_people=data['people'],
+                id_proof=data['id_proof'],
+                check_in=data['check_in'],
+                check_out=data['check_out']
+            )
 
-        del request.session['booking_data']
+            # ✅ session safe delete
+            if 'booking_data' in request.session:
+                del request.session['booking_data']
 
-        return JsonResponse({"status": "success"})
+            return JsonResponse({"status": "success"})
 
+        except Exception as e:
+            print("❌ VERIFY ERROR:", e)
+            return JsonResponse({"status": "failed", "error": str(e)})
 
 
 def generate_pdf(booking):
