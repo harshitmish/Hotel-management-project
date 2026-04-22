@@ -23,6 +23,23 @@ from datetime import timedelta
 from django.utils import timezone
 from django.core.mail import EmailMessage
 from io import BytesIO
+import threading
+
+def send_email_async(subject, message, to_email):
+    from django.core.mail import send_mail
+    from django.conf import settings
+
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [to_email],
+            fail_silently=False
+        )
+    except Exception as e:
+        print("EMAIL ERROR:", e)
+
 
 def generate_pdf(booking):
     buffer = BytesIO()
@@ -322,6 +339,22 @@ def book_details(request):
     })
 
 
+import threading
+
+# 🔥 async email function (NEW ADD)
+def send_email_async(subject, message, to_email):
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,   # 🔥 FIXED
+            [to_email],
+            fail_silently=False
+        )
+    except Exception as e:
+        print("Email error:", e)
+
+
 def signup(request):
     if request.method == 'POST':
         email = request.POST.get('email').strip().lower()
@@ -346,28 +379,21 @@ def signup(request):
         # DB me save
         OTP.objects.create(email=email, otp=otp)
 
-        # 📩 Email send
-        from django.core.mail import send_mail
-
-        try:
-            send_mail(
-                'Your OTP Code',
-                f'Your OTP is {otp}',
-                settings.EMAIL_HOST_USER,
-                [email],
-                fail_silently=False   # 🔥 MUST
-            )
-        except Exception as e:
-            print("Email error:", e)
+        # 📩 EMAIL (ASYNC - FIX)
+        threading.Thread(
+            target=send_email_async,
+            args=('Your OTP Code', f'Your OTP is {otp}', email)
+        ).start()
 
         # 🔐 session save
         request.session['email'] = email
         request.session['password'] = password
 
         messages.success(request, "OTP sent to your email 📩")
-        return redirect('verify_otp')   # 👈 IMPORTANT
+        return redirect('verify_otp')
 
     return render(request, 'booking/signup.html')
+
 
 def verify_otp(request):
     if request.method == 'POST':
@@ -413,16 +439,11 @@ def resend_otp(request):
 
     OTP.objects.create(email=email, otp=otp)
 
-    try:
-        send_mail(
-            'Resent OTP',
-            f'Your new OTP is {otp}',
-            settings.EMAIL_HOST_USER,
-            [email],
-            fail_silently=False
-        )
-    except Exception as e:
-        print("Email error:", e)   # 🔥 LOG में दिखेगा
+    # 📩 EMAIL (ASYNC - FIX)
+    threading.Thread(
+        target=send_email_async,
+        args=('Resent OTP', f'Your new OTP is {otp}', email)
+    ).start()
 
     messages.success(request, "OTP resent 📩")
     return redirect('verify_otp')
