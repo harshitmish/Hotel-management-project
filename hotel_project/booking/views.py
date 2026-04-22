@@ -18,61 +18,8 @@ from django.core.mail import send_mail
 from django.http import HttpResponse
 import random
 from django.conf import settings
-from .models import OTP
 from datetime import timedelta
 from django.utils import timezone
-from django.core.mail import EmailMessage
-from io import BytesIO
-import threading
-
-import threading
-from django.core.mail import send_mail
-from django.conf import settings
-
-
-# 🔥 ASYNC EMAIL FUNCTION (FIXED)
-def send_email_async(subject, message, to_email):
-    print("🔥 TRYING TO SEND EMAIL TO:", to_email)
-
-    try:
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [to_email],
-            fail_silently=True   # 🔥 IMPORTANT (Railway safe)
-        )
-        print("✅ EMAIL SENT SUCCESS")
-    except Exception as e:
-        print("❌ EMAIL ERROR:", e)
-
-
-
-# 🔥 RESEND OTP (FIXED)
-def resend_otp(request):
-    email = request.session.get('email')
-
-    if not email:
-        return redirect('signup')
-
-    otp = str(random.randint(100000, 999999))
-
-    # 🔥 OLD OTP हटाओ (confusion avoid)
-    OTP.objects.filter(email=email).delete()
-
-    # 🔥 NEW OTP save
-    OTP.objects.create(email=email, otp=otp)
-
-    # 📩 EMAIL (ASYNC THREAD)
-    thread = threading.Thread(
-        target=send_email_async,
-        args=('Resent OTP', f'Your new OTP is {otp}', email)
-    )
-    thread.daemon = True   # 🔥 IMPORTANT (server shutdown safe)
-    thread.start()
-
-    messages.success(request, "OTP resent 📩")
-    return redirect('verify_otp')
 
 
 def generate_pdf(booking):
@@ -373,9 +320,6 @@ def book_details(request):
     })
 
 
-import threading
-
-
 def signup(request):
     if request.method == 'POST':
         email = request.POST.get('email').strip().lower()
@@ -394,60 +338,19 @@ def signup(request):
             messages.error(request, "Already registered ❌")
             return redirect('signup')
 
-        # 🔥 OTP generate
-        otp = str(random.randint(100000, 999999))
+        User.objects.create_user(
+            username=email,
+            email=email,
+            password=password
+        )
 
-        # DB me save
-        OTP.objects.create(email=email, otp=otp)
-
-        # 📩 EMAIL (ASYNC - FIX)
-        threading.Thread(
-            target=send_email_async,
-            args=('Your OTP Code', f'Your OTP is {otp}', email)
-        ).start()
-
-        # 🔐 session save
-        request.session['email'] = email
-        request.session['password'] = password
-
-        messages.success(request, "OTP sent to your email 📩")
-        return redirect('verify_otp')
+        messages.success(request, "Account created ✅")
+        return redirect('login')
 
     return render(request, 'booking/signup.html')
 
 
-def verify_otp(request):
-    if request.method == 'POST':
-        entered_otp = request.POST.get('otp')
-        email = request.session.get('email')
-        password = request.session.get('password')
 
-        otp_obj = OTP.objects.filter(email=email).last()
-
-        if otp_obj:
-            # ⏰ expiry check
-            if timezone.now() > otp_obj.created_at + timedelta(minutes=5):
-                otp_obj.delete()
-                messages.error(request, "OTP expired ❌")
-                return redirect('signup')
-
-            if otp_obj.otp == entered_otp:
-                User.objects.create_user(
-                    username=email,
-                    email=email,
-                    password=password
-                )
-
-                otp_obj.delete()
-                del request.session['email']
-                del request.session['password']
-
-                messages.success(request, "Account created 🎉")
-                return redirect('login')
-
-        messages.error(request, "Invalid OTP ❌")
-
-    return render(request, 'booking/verify_otp.html')
 
 
 

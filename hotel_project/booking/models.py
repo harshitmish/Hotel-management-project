@@ -6,11 +6,6 @@ from django.db import models
 class Meta:
     unique_together = ('user', 'room', 'check_in', 'check_out')
 
-class OTP(models.Model):
-    email = models.EmailField()
-    otp = models.CharField(max_length=6)
-    created_at = models.DateTimeField(auto_now_add=True)
-
 class Room(models.Model):
     ROOM_TYPES = (
         ('AC', 'AC'),
