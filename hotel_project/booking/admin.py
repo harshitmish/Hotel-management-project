@@ -11,7 +11,7 @@ class CustomAdminSite(admin.AdminSite):
     site_header = "Hotel Dashboard"
 
     def index(self, request, extra_context=None):
-        return redirect('/admin/dashboard/')
+        return super().index(request, extra_context)
 
     def get_urls(self):
         urls = super().get_urls()
@@ -93,3 +93,4 @@ class BookingAdmin(admin.ModelAdmin):
 admin_site.register(Room, RoomAdmin)
 admin_site.register(Booking, BookingAdmin)
 admin_site.register(RoomImage, RoomImageAdmin)
+
