@@ -4,6 +4,11 @@ from django.urls import path
 from django.shortcuts import render, redirect
 from django.db.models import Count
 from django.utils.html import format_html
+from allauth.socialaccount.models import SocialApp
+from django.contrib.sites.models import Site
+
+admin_site.register(SocialApp)
+admin_site.register(Site)
 
 
 # 🔥 CUSTOM ADMIN
