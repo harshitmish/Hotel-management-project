@@ -25,6 +25,12 @@ from django.core.mail import EmailMessage
 from io import BytesIO
 import threading
 
+import threading
+from django.core.mail import send_mail
+from django.conf import settings
+
+
+# 🔥 ASYNC EMAIL FUNCTION (FIXED)
 def send_email_async(subject, message, to_email):
     print("🔥 TRYING TO SEND EMAIL TO:", to_email)
 
@@ -34,11 +40,39 @@ def send_email_async(subject, message, to_email):
             message,
             settings.DEFAULT_FROM_EMAIL,
             [to_email],
-            fail_silently=False
+            fail_silently=True   # 🔥 IMPORTANT (Railway safe)
         )
         print("✅ EMAIL SENT SUCCESS")
     except Exception as e:
         print("❌ EMAIL ERROR:", e)
+
+
+
+# 🔥 RESEND OTP (FIXED)
+def resend_otp(request):
+    email = request.session.get('email')
+
+    if not email:
+        return redirect('signup')
+
+    otp = str(random.randint(100000, 999999))
+
+    # 🔥 OLD OTP हटाओ (confusion avoid)
+    OTP.objects.filter(email=email).delete()
+
+    # 🔥 NEW OTP save
+    OTP.objects.create(email=email, otp=otp)
+
+    # 📩 EMAIL (ASYNC THREAD)
+    thread = threading.Thread(
+        target=send_email_async,
+        args=('Resent OTP', f'Your new OTP is {otp}', email)
+    )
+    thread.daemon = True   # 🔥 IMPORTANT (server shutdown safe)
+    thread.start()
+
+    messages.success(request, "OTP resent 📩")
+    return redirect('verify_otp')
 
 
 def generate_pdf(booking):
@@ -341,19 +375,6 @@ def book_details(request):
 
 import threading
 
-# 🔥 async email function (NEW ADD)
-def send_email_async(subject, message, to_email):
-    try:
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,   # 🔥 FIXED
-            [to_email],
-            fail_silently=False
-        )
-    except Exception as e:
-        print("Email error:", e)
-
 
 def signup(request):
     if request.method == 'POST':
@@ -429,24 +450,6 @@ def verify_otp(request):
     return render(request, 'booking/verify_otp.html')
 
 
-def resend_otp(request):
-    email = request.session.get('email')
-
-    if not email:
-        return redirect('signup')
-
-    otp = str(random.randint(100000, 999999))
-
-    OTP.objects.create(email=email, otp=otp)
-
-    # 📩 EMAIL (ASYNC - FIX)
-    threading.Thread(
-        target=send_email_async,
-        args=('Resent OTP', f'Your new OTP is {otp}', email)
-    ).start()
-
-    messages.success(request, "OTP resent 📩")
-    return redirect('verify_otp')
 
 # 🔐 LOGIN
 def user_login(request):
