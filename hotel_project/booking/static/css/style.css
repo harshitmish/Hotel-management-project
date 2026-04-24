@@ -524,3 +524,157 @@ body {
     color: #f4a261;
     border-bottom: 2px solid #f4a261;
 }
+
+/*FOoter start*/
+.footer {
+    background: #3b2f2f;
+    color: #fff;
+    padding: 60px 0 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.footer-container {
+    width: 90%;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+/* columns */
+.footer-col {
+    flex: 1;
+}
+
+.footer-col h4 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #fff;
+}
+
+.footer-col p {
+    font-size: 14px;
+    color: #ddd;
+    line-height: 1.6;
+}
+
+/* logo */
+.logo {
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+/* subscribe */
+.subscribe-box {
+    display: flex;
+    margin-top: 10px;
+}
+
+.subscribe-box input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    outline: none;
+}
+
+.subscribe-box button {
+    background: #f4a261;
+    border: none;
+    padding: 0 20px;
+    cursor: pointer;
+    color: white;
+    font-size: 18px;
+}
+
+/* bottom */
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    margin-top: 40px;
+    padding-top: 15px;
+    font-size: 14px;
+}
+
+
+
+
+/* ===== PROMO SECTION ===== */
+.promo-section {
+    position: relative;
+    height: 400px;
+
+    background: url('/static/images/hotel.jpg') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* DARK OVERLAY */
+.promo-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(30, 20, 20, 0.7);
+}
+
+/* CONTENT */
+.promo-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+    max-width: 700px;
+
+    animation: fadeUp 1s ease;
+}
+
+/* LINE */
+.promo-content .line {
+    width: 60px;
+    height: 3px;
+    background: #f4a261;
+    margin: 0 auto 20px;
+}
+
+/* TITLE */
+.promo-content h2 {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+/* TEXT */
+.promo-content p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin-bottom: 25px;
+}
+
+/* BUTTON */
+.promo-btn {
+    display: inline-block;
+    background: #f4a261;
+    padding: 14px 30px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 1px;
+
+    transition: 0.3s;
+}
+
+/* HOVER */
+.promo-btn:hover {
+    background: #000;
+}
+
+/* ANIMATION */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
