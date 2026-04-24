@@ -1,12 +1,18 @@
 /* ===== GLOBAL ===== */
+
 :root {
     --nav-h: 70px;
 }
 
-body {
+html, body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+.container {
+    max-width: 100% !important;
 }
 
 /* ===== NAVBAR FIX ===== */
@@ -14,12 +20,23 @@ body {
     height: var(--nav-h);
 }
 
+.row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+} 
+img {
+    max-width: 100%;
+    height: auto;
+}
+
 /* ===== HERO ===== */
 .hero {
     height: 100vh;
     min-height: 520px;
     position: relative;
-    padding-top: var(--nav-h); /* 🔥 NAVBAR SPACE FIX */
+    padding-top: var(--nav-h); 
+    width: 100%;
+    max-width: 100%;
 }
 
 /* ===== HERO CONTENT ===== */
@@ -919,6 +936,9 @@ body {
     border-radius: 15px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     margin-bottom: 30px;
+    width: 100%;
+    left: 0;
+    transform: none;
 }
 
 .booking-bar input,
