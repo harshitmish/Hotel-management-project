@@ -2,11 +2,12 @@
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="page-wrapper">
 
     <!-- 🔥 ROOM TITLE -->
-    <h2 class="fw-bold">{{ room.name }}</h2>
-    <p class="text-muted">{{ room.room_type }}</p>
+    <div class="room-header">
+    <h2>{{ room.name }}</h2>
+</div>
 
     <!-- 🔥 PREMIUM IMAGE GALLERY -->
     <div class="row mb-4">
@@ -36,9 +37,11 @@
     </div>
 
     <!-- 🔥 PRICE + BOOK -->
-    <h4 class="text-danger">₹{{ room.price }} / night</h4>
+    <div class="price-box">
+    ₹{{ room.price }} <span>/ night</span>
+</div>
 
-    <a href="{% url 'book_room' %}?room_id={{ room.id }}" class="btn btn-danger mb-3">
+    <a href="{% url 'book_room' %}?room_id={{ room.id }}" class="btn btn-book-premium mb-3">
         Book Now
     </a>
 
@@ -52,13 +55,13 @@
     {% endif %}
 
     <!-- 🔥 DETAILS -->
-    <div class="card p-3 mb-4">
+    <div class="premium-card">
         <h5>Room Details</h5>
         <p>{{ room.description }}</p>
     </div>
 
     <!-- 🔥 FEATURES -->
-    <div class="card p-3 mb-4">
+    <div class="premium-card">
         <h5>Features</h5>
         <p>{{ room.features }}</p>
     </div>
@@ -99,11 +102,30 @@
 
 <!-- 🔥 STYLE -->
 <style>
+    .page-wrapper {
+    margin-top: 90px;
+    padding: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.room-header h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2d3436;
+    text-align: center;
+}
 .main-img {
-    height: 400px;
+    height: 450px;
     width: 100%;
     object-fit: cover;
-    cursor: pointer;
+    border-radius: 20px;
+    transition: 0.4s;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.main-img:hover {
+    transform: scale(1.02);
 }
 
 .thumb {
@@ -124,16 +146,33 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 30px;
+    font-size: 24px;
     color: white;
-    background: rgba(0,0,0,0.5);
-    padding: 5px 10px;
+    background: rgba(0,0,0,0.4);
+    padding: 8px 12px;
+    border-radius: 50%;
     cursor: pointer;
-    border-radius: 5px;
+    transition: 0.3s;
 }
 
+.arrow:hover {
+    background: #e17055;
+}
 .left { left: 10px; }
 .right { right: 10px; }
+
+
+.price-box {
+    font-size: 28px;
+    font-weight: 700;
+    color: #701e0a;
+    margin-bottom: 10px;
+}
+
+.price-box span {
+    font-size: 16px;
+    color: gray;
+}
 
 #fullscreen-modal {
     display: none;
@@ -149,6 +188,28 @@
 #fullscreen-modal img {
     max-width: 90%;
     max-height: 90%;
+}
+
+.btn-book-premium {
+    background: linear-gradient(45deg, #e17055, #d63031);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-book-premium:hover {
+    transform: scale(1.05);
+}
+
+.premium-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 </style>
 

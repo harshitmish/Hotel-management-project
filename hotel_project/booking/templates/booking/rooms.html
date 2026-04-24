@@ -1,265 +1,111 @@
 {% extends 'booking/base.html' %}
-
+{% load static %}
 {% block content %}
-<style>
-body {
-    background: #f5f7fa;
-}
 
-/* 🔥 CARD */
-.card-premium {
-    border: none;
-    border-radius: 18px;
-    overflow: hidden;
-    transition: 0.3s ease;
-    background: #fff;
-    cursor: pointer;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
+<div class="rooms-page">
 
-.card-premium:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-}
+<div class="container rooms-page">
 
-/* 🔥 IMAGE FIX */
-.room-img {
-    height: 220px;
-    object-fit: cover;
-}
+<!-- 🔥 FILTER -->
+<div class="booking-bar premium-bar mt-5">
 
-/* 🔥 PRICE */
-.price-tag {
-    font-size: 20px;
-    font-weight: 600;
-    color: #ff4d4d;
-}
+    <form method="GET" class="row w-100 align-items-center">
 
-/* 🔥 TYPE */
-.room-type {
-    font-size: 12px;
-    color: gray;
-    margin-bottom: 5px;
-}
+        <div class="col-md-3 mb-2">
+            <input type="text" name="q" class="form-control" placeholder="🔍 Search rooms">
+        </div>
 
-/* 🔥 BADGE */
-.badge-custom {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: #28a745;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    z-index: 10;
-}
+        <div class="col-md-2 mb-2">
+            <select name="type" class="form-control">
+                <option value="">All Types</option>
+                <option value="AC">AC</option>
+                <option value="NON-AC">Non-AC</option>
+                <option value="DELUXE">Deluxe</option>
+            </select>
+        </div>
 
-/* 🔥 REVIEW FIX */
-.review-box {
-    max-height: 80px;
-    overflow-y: auto;
-    padding-right: 5px;
-}
+        <div class="col-md-2 mb-2">
+            <input type="number" name="min_price" class="form-control" placeholder="Min ₹">
+        </div>
 
-.review-box::-webkit-scrollbar {
-    width: 4px;
-}
-.review-box::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 10px;
-}
+        <div class="col-md-2 mb-2">
+            <input type="number" name="max_price" class="form-control" placeholder="Max ₹">
+        </div>
 
-.review-card {
-    font-size: 11px;
-    padding: 6px;
-    margin-bottom: 5px;
-    border-radius: 8px;
-    background: #f1f3f6;
-}
+        <div class="col-md-3 mb-2">
+            <button class="check-btn w-100">CHECK ROOMS</button>
+        </div>
 
-/* 🔥 BUTTON */
-.btn-book {
-    border-radius: 25px;
-    padding: 10px;
-    font-weight: 500;
-}
+    </form>
 
-/* 🔥 HEIGHT FIX */
-.card-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
+</div>
 
-/* 🔥 MOBILE PERFECT FIX (SAFE) */
+<h2 class="text-center mb-5 title-main">Best Rooms For You</h2>
 
-@media (max-width: 768px) {
+<div class="row">
 
-    /* 🔥 ROW RESET */
-    .row {
-        margin-left: auto !important;
-        margin-right: auto !important;
-    }
-
-    /* 🔥 CONTAINER CENTER */
-    .container {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-    }
-
-    /* 🔥 COLUMN FIX */
-    .col-lg-4,
-    .col-md-6,
-    .col-12 {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-    }
-
-    /* 🔥 CARD WIDTH FIX */
-    .card-premium {
-        width: 100%;
-    }
-
-}
-
-</style>
-
-<div class="container mt-5">
-    <form method="GET" class="row mb-4 filter-box">
-
-    <div class="col-lg-3 col-md-6 col-12 mb-2">
-        <input type="text" name="q" class="form-control" placeholder="🔍 Search rooms">
-    </div>
-
-    <div class="col-lg-2 col-md-6 col-12 mb-2">
-        <select name="type" class="form-control">
-            <option value="">All Types</option>
-            <option value="AC">AC</option>
-            <option value="NON-AC">Non-AC</option>
-            <option value="DELUXE">Deluxe</option>
-        </select>
-    </div>
-
-    <div class="col-lg-2 col-md-6 col-6 mb-2">
-        <input type="number" name="min_price" class="form-control" placeholder="Min ₹">
-    </div>
-
-    <div class="col-lg-2 col-md-6 col-6 mb-2">
-        <input type="number" name="max_price" class="form-control" placeholder="Max ₹">
-    </div>
-
-    <div class="col-lg-2 col-md-12 col-12 mb-2">
-        <button class="btn btn-danger w-100">Apply</button>
-    </div>
-
-</form>
-
-<h2 class="text-center mb-5 fw-bold">🏨 Premium Rooms</h2>
-
-<div class="row justify-content-center">
 {% for room in rooms %}
+<div class="col-lg-4 col-md-6 mb-4">
 
-<!-- 🔥 ONLY CHANGE HERE -->
-<div class="col-lg-4 col-md-6 col-12 mb-4">
-
-<div class="card card-premium position-relative room-card"
+<div class="room-card-new room-card"
      data-url="{% url 'room_detail' room.id %}">
 
-    {% if room.is_available %}
-    <div class="badge-custom">Available</div>
+    <!-- IMAGE -->
+    <div class="img-box">
+
+    {% if room.images.first %}
+        <img src="{{ room.images.first.image.url }}" class="room-img">
     {% else %}
-    <div class="badge-custom" style="background:red;">Booked</div>
+        <img src="{% static 'images/hotel.jpg' %}" class="room-img">
     {% endif %}
 
-    <div id="carousel{{ room.id }}" class="carousel slide">
-        <div class="carousel-inner">
-            {% for img in room.images.all %}
-            <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <img src="{{ img.image.url }}" class="d-block w-100 room-img">
+    <span class="price-tag">₹{{ room.price }}</span>
+
+</div>
+
+    <!-- CONTENT -->
+    <div class="room-content">
+
+        <h4>{{ room.name }}</h4>
+        <p class="room-type">{{ room.room_type }}</p>
+
+        {% if room.avg_rating %}
+            <div class="rating">⭐ {{ room.avg_rating|floatformat:1 }} / 5</div>
+        {% else %}
+            <small>No reviews yet</small>
+        {% endif %}
+
+        <!-- REVIEWS -->
+        <div class="review-box mt-2">
+            {% for review in room.reviews.all|slice:":2" %}
+            <div class="review-card">
+                <b>{{ review.user.username }}</b><br>
+                {{ review.comment|truncatechars:30 }}
             </div>
             {% endfor %}
         </div>
 
-        <button class="carousel-control-prev" type="button"
-            data-bs-target="#carousel{{ room.id }}" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-
-        <button class="carousel-control-next" type="button"
-            data-bs-target="#carousel{{ room.id }}" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
-    </div>
-
-    <div class="card-body text-center">
-
-        <div>
-            <h5 class="fw-bold">{{ room.name }}</h5>
-            <p class="room-type">{{ room.room_type }}</p>
-
-            {% if room.avg_rating %}
-            <div class="mb-2">
-                ⭐ {{ room.avg_rating|floatformat:1 }} / 5
-            </div>
-            {% else %}
-            <small class="text-muted">No reviews yet</small>
-            {% endif %}
-
-            <div class="review-box text-start mt-2">
-                {% for review in room.reviews.all|slice:":2" %}
-                <div class="review-card">
-                    <b class="text-primary">{{ review.user.username }}</b>
-                    <div style="color:#ffc107;">
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= review.rating %}
-                                ★
-                            {% else %}
-                                ☆
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                    <div>{{ review.comment|truncatechars:30 }}</div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div>
-            <p class="price-tag mt-3">₹{{ room.price }} / night</p>
-
-            <a href="{% url 'book_room' %}?room_id={{ room.id }}"
-               class="btn btn-danger w-100 btn-book">
-                Book Now
-            </a>
-        </div>
+        <a href="{% url 'book_room' %}?room_id={{ room.id }}" class="btn-book">
+            Book Now
+        </a>
 
     </div>
 
 </div>
-
 </div>
 {% endfor %}
-</div>
-</div>
 
+</div>
+</div>
+</div>
 <script>
 document.querySelectorAll('.room-card').forEach(card => {
     card.addEventListener('click', function(e) {
-        if (
-            e.target.closest('a') || 
-            e.target.closest('.carousel-control-prev') || 
-            e.target.closest('.carousel-control-next')
-        ) return;
 
-        window.location.href = this.getAttribute('data-url');
+        if (e.target.closest('a')) return;
+
+        window.location.href = this.dataset.url;
     });
 });
 </script>
-
 {% endblock %}
