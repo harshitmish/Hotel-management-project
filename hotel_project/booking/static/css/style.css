@@ -148,7 +148,9 @@ body {
     bottom: 30px;
     width: 100%;
     text-align: center;
+    z-index: 5;
 }
+
 .dots span {
     display: inline-block;
     width: 25px;
@@ -156,9 +158,7 @@ body {
     background: #aaa;
     margin: 0 5px;
 }
-.dots .active {
-    background: #f4a261;
-}
+
 
 
 /* ===== PREMIUM BOOKING BAR ===== */
@@ -743,3 +743,5 @@ body {
     padding: 10px;
     color: white;
 }
+
+

@@ -233,27 +233,28 @@ def my_bookings(request):
 
 
 #home
-
 def home(request):
 
-    # TOP 3 ROOMS (latest or highest price — choose one)
-    rooms = Room.objects.all().order_by('-id')[:3]
+    # ALL ROOMS (shuffle so every type comes)
+    rooms = list(Room.objects.all())
+    random.shuffle(rooms)
+    rooms = rooms[:3]   
 
-    # CATEGORY WISE (top 3 each)
+    # 👉 CATEGORY WISE 
     ac_rooms = Room.objects.filter(room_type='AC').order_by('-id')[:3]
     non_ac_rooms = Room.objects.filter(room_type='NON-AC').order_by('-id')[:3]
     deluxe_rooms = Room.objects.filter(room_type='DELUXE').order_by('-id')[:3]
 
-    # TOP 3 REVIEWS (HIGHEST RATING)
+    # 👉 TOP REVIEWS
     reviews = Review.objects.select_related('user')\
         .order_by('-rating', '-id')[:3]
 
     return render(request, 'booking/home.html', {
-        'rooms': rooms,
+        'rooms': rooms,   # 
         'ac_rooms': ac_rooms,
         'non_ac_rooms': non_ac_rooms,
         'deluxe_rooms': deluxe_rooms,
-        'reviews': reviews   # 🔥 IMPORTANT
+        'reviews': reviews
     })
 
 # 🏨 ROOMS
