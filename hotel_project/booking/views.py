@@ -599,6 +599,19 @@ def booking_summary(request):
         'data': data
     })
 
+def services(request):
+    return render(request, 'booking/services.html')
+
+def contact(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        message = request.POST.get("message")
+
+        print(name, email, message)  
+
+    return render(request, 'booking/contact.html')
+
 # 🤖 CHATBOT (UNCHANGED)
 def chatbot(request):
     msg = request.GET.get("message", "").lower()

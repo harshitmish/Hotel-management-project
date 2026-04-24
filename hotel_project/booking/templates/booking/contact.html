@@ -1,0 +1,181 @@
+{% extends 'booking/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="contact-page">
+
+    <!-- 🔥 HERO -->
+    <div class="contact-hero">
+        <div class="overlay"></div>
+
+        <div class="hero-content text-center">
+            <h1>Contact Us</h1>
+            <p>We’d love to hear from you</p>
+        </div>
+    </div>
+
+    <!-- 🔥 CONTACT SECTION -->
+    <div class="container py-5">
+
+        <div class="row">
+
+            <!-- 🔥 LEFT INFO -->
+            <div class="col-md-5 mb-4">
+                <div class="contact-info">
+
+                    <h3>Get In Touch</h3>
+                    <p class="text-muted">
+                        Feel free to contact us anytime. We are available 24/7 to assist you.
+                    </p>
+
+                    <div class="info-box">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>1230 Azad College, Lucknow</span>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fas fa-phone"></i>
+                        <span>+91 98765xxxx</span>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fas fa-envelope"></i>
+                        <span>contact@hotelbuddha.com</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 🔥 RIGHT FORM -->
+            <div class="col-md-7">
+                <div class="contact-card">
+
+                    <h4 class="text-center mb-4">Send Message</h4>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <input type="text" name="name" class="form-control input-premium" placeholder="Your Name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <input type="email" name="email" class="form-control input-premium" placeholder="Your Email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <textarea name="message" rows="4" class="form-control input-premium" placeholder="Your Message" required></textarea>
+                        </div>
+
+                        <button class="btn btn-contact w-100">
+                            Send Message 🚀
+                        </button>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- 🔥 STYLE -->
+<style>
+
+.contact-hero {
+    height: 45vh;
+    background: url("{% static 'images/hotel-bg.webp' %}") center/cover no-repeat;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contact-hero .overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+}
+
+.hero-content {
+    position: relative;
+    color: white;
+}
+
+.hero-content h1 {
+    font-size: 38px;
+    font-weight: 700;
+}
+
+/* 🔥 INFO */
+.contact-info {
+    padding: 20px;
+}
+
+.info-box {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    font-weight: 500;
+}
+
+.info-box i {
+    font-size: 18px;
+    margin-right: 10px;
+    color: #e6955c;
+}
+
+/* 🔥 CARD */
+.contact-card {
+    padding: 30px;
+    border-radius: 20px;
+
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+/* 🔥 INPUT */
+.input-premium {
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+}
+
+.input-premium:focus {
+    border-color: #e6955c;
+    box-shadow: 0 0 0 2px rgba(230,149,92,0.2);
+}
+
+/* 🔥 BUTTON */
+.btn-contact {
+    background: linear-gradient(45deg, #7a1c00, #a52a00);
+    color: white;
+    padding: 12px;
+    border-radius: 25px;
+    font-weight: 600;
+    border: none;
+    transition: 0.3s;
+}
+
+.btn-contact:hover {
+    transform: scale(1.05);
+}
+
+/* MOBILE */
+@media (max-width:768px){
+    .hero-content h1 {
+        font-size: 26px;
+    }
+}
+
+</style>
+
+{% endblock %}
