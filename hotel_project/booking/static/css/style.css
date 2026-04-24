@@ -1,7 +1,6 @@
 /* ===== GLOBAL ===== */
-
 :root {
-    --nav-h: 70px;
+    --nav-h: 50px;
 }
 
 html, body {
@@ -10,6 +9,7 @@ html, body {
     padding: 0;
     width: 100%;
     overflow-x: hidden;
+    
 }
 .container {
     max-width: 100% !important;
@@ -548,7 +548,14 @@ img {
 
 
 /* ===== REVIEWS ===== */
+.reviews-section .line {
+    width: 60px;
+    height: 3px;
+    background: #f4a261;
+    margin: 0 auto 20px;
 
+    
+}
 .reviews-section {
     padding: 80px 0;
     background: #f7f7f7;
@@ -707,7 +714,7 @@ img {
     width: 60px;
     height: 3px;
     background: #f4a261;
-    margin: 0 auto 20px;
+    margin: 0 auto 20px; 
 }
 
 /* TITLE */

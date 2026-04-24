@@ -357,6 +357,12 @@ def book_room(request):
 
 
 # 📅 STEP 2 (UPDATED)
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Room
+
+
 @login_required
 def book_details(request):
     room_id = request.GET.get('room_id')
@@ -364,7 +370,10 @@ def book_details(request):
     if not room_id:
         return redirect('rooms')
 
-    room = Room.objects.get(id=room_id)
+    try:
+        room = Room.objects.get(id=room_id)
+    except Room.DoesNotExist:
+        return redirect('rooms')
 
     check_in = request.session.get('check_in')
     check_out = request.session.get('check_out')
@@ -380,39 +389,53 @@ def book_details(request):
         # 📞 PHONE
         country_code = request.POST.get('country_code')
         phone = request.POST.get('phone')
-        phone = f"{country_code}{phone}"
 
-        if not phone or not phone.replace("+", "").isdigit():
+        if not phone or not phone.isdigit() or len(phone) != 10:
             messages.error(request, "Invalid phone number ❌")
             return redirect(request.path + f"?room_id={room_id}")
 
+        phone = f"{country_code}{phone}"
+
         # 🆔 AADHAR
         id_proof = request.POST.get('id_proof')
+
         if not id_proof or not id_proof.isdigit() or len(id_proof) != 12:
-            messages.error(request, "Aadhar must be 12 digits ❌")
+            messages.error(request, "Aadhar must be exactly 12 digits ❌")
             return redirect(request.path + f"?room_id={room_id}")
 
+        # 👥 PEOPLE
         people = request.POST.get('people')
 
         if not people:
-            messages.error(request, "Select people ❌")
+            messages.error(request, "Select number of people ❌")
             return redirect(request.path + f"?room_id={room_id}")
 
         people = int(people)
 
         if people > room.capacity:
-            messages.error(request, f"Max {room.capacity} people ❌")
+            messages.error(request, f"Max {room.capacity} people allowed ❌")
             return redirect(request.path + f"?room_id={room_id}")
 
+        # 🔥 SERVICES (NEW)
+        services = request.POST.getlist('services')  # list milegi
+
+        # OPTIONAL: readable format
+        services_display = ", ".join(services) if services else "None"
+
+        # 💾 SESSION SAVE
         request.session['booking_data'] = {
             'room_id': room.id,
             'name': name,
             'phone': phone,
             'people': people,
             'id_proof': id_proof,
+            'services': services,  # raw list
+            'services_display': services_display,  # readable
             'check_in': check_in,
             'check_out': check_out
         }
+
+        messages.success(request, "Details added successfully ✅")
 
         return redirect('booking_summary')
 
