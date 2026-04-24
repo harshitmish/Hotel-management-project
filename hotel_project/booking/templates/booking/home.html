@@ -324,30 +324,32 @@ function goRoom(id){
     window.location.href = "/room/" + id;
 }
 </script>
-<!-- filterkrne ke liye room front me -->
+<!-- CHECK RAtes-->>
 <script>
-function filterRoom(type, el){
+document.addEventListener("DOMContentLoaded", function () {
 
-    let items = document.querySelectorAll(".room-item");
+    const btn = document.querySelector(".check-btn");
 
-    // tabs active
-    document.querySelectorAll(".room-tabs li").forEach(tab=>{
-        tab.classList.remove("active");
+    btn.addEventListener("click", function () {
+
+        const date = document.getElementById("dateRange").value;
+        const guests = document.getElementById("guests").value;
+
+        // 🔥 validation
+        if (!date) {
+            alert("Please select dates");
+            return;
+        }
+
+        if (guests === "Guests") {
+            alert("Select guests");
+            return;
+        }
+
+        // 🔥 redirect
+        window.location.href = `/rooms/?date=${date}&guests=${guests}`;
     });
-    el.classList.add("active");
 
-    items.forEach(item=>{
-        if(type === "all"){
-            item.style.display = "block";
-        }
-        else if(item.classList.contains(type)){
-            item.style.display = "block";
-        }
-        else{
-            item.style.display = "none";
-        }
-    });
-
-}
+});
 </script>
 {% endblock %}
