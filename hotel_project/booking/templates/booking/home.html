@@ -1,271 +1,353 @@
 {% extends 'booking/base.html' %}
 {% load static %}
 
-{% block extra_css %}
-<style>
-
-/* 📱 MOBILE CENTER FIX (SAFE) */
-@media (max-width: 768px) {
-
-    /* container fix */
-    .container {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-    }
-
-    /* row fix */
-    .row {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        justify-content: center !important;
-    }
-
-    /* column fix */
-    .row > div {
-        padding-left: 8px !important;
-        padding-right: 8px !important;
-    }
-
-    /* card full width */
-    .col-md-4,
-    .col-lg-4 {
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-
-}
-/* 🔥 CARD HOVER */
-.card {
-    transition: 0.3s ease;
-    cursor: pointer;
-    position: relative;
-}
-.card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-}
-
-/* 🔥 IMAGE ZOOM */
-.room-img {
-    height: 220px;
-    object-fit: cover;
-    transition: 0.4s;
-}
-.card:hover .room-img {
-    transform: scale(1.08);
-}
-
-/* 🔥 FADE IN */
-.fade-in {
-    opacity: 0;
-    transform: translateY(30px);
-    animation: fadeUp 0.8s ease forwards;
-}
-
-@keyframes fadeUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* 🔥 BADGE NEW */
-.badge-premium {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: linear-gradient(45deg, #ff7675, #fd79a8);
-    color: white;
-    padding: 5px 12px;
-    font-size: 11px;
-    border-radius: 20px;
-    z-index: 5;
-}
-
-/* 🔥 GLASS BUTTON */
-.btn-danger {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 0, 0, 0.8);
-    border: none;
-}
-.btn-danger:hover {
-    background: rgba(255, 0, 0, 1);
-}
-
-/* 🔥 SCROLL ANIMATION */
-.scroll-animate {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: 0.6s ease;
-}
-.scroll-animate.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* 🔥 HERO GRADIENT UPGRADE (ADD ONLY, REMOVE NAHI) */
-.hero-overlay {
-    background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(108,92,231,0.6));
-}
-
-/* 🔥 TEXT GLOW */
-#hero-text {
-    text-shadow: 0 0 20px rgba(255,255,255,0.4);
-}
-
-</style>
-<style>
-
-/* 📱 MOBILE FIX */
-@media (max-width: 768px) {
-
-    /* HERO TEXT */
-    #hero-text {
-        font-size: 28px !important;
-    }
-
-    .hero-overlay + div p {
-        font-size: 14px !important;
-    }
-
-    /* HERO HEIGHT */
-    div[style*="height:80vh"] {
-        height: 60vh !important;
-    }
-
-    /* CARD */
-    .room-img {
-        height: 180px !important;
-    }
-
-    /* SPACING */
-    .container {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    /* BUTTON */
-    .btn-danger {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    /* TEXT */
-    h2 {
-        font-size: 22px !important;
-    }
-
-    p {
-        font-size: 14px !important;
-    }
-}
-
-</style>
-{% endblock %}
-
 {% block content %}
 
-<!-- HERO SECTION (UPGRADED BUT SAME STRUCTURE ✔) -->
-<div style="height:80vh; background:url('https://images.unsplash.com/photo-1566073771259-6a8506099945') center/cover no-repeat; position:relative; border-radius:15px; overflow:hidden;">
+<!-- HERO SLIDER -->
+<section class="hero">
 
-    <!-- 🔥 UPDATED OVERLAY -->
-    <div class="hero-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%;"></div>
+    <!-- SLIDES -->
+    <div class="slide active" style="background-image:url('{% static "images/hotel.jpg" %}')"></div>
+    <div class="slide" style="background-image:url('{% static "images/hotel2.avif" %}')"></div>
+    <div class="slide" style="background-image:url('{% static "images/hotel3.webp" %}')"></div>
+    <div class="slide" style="background-image:url('{% static "images/hotel4.png" %}')"></div>
+    
+    <div class="overlay"></div>
+    <!-- LEFT RIGHT BUTTON -->
+<div class="slider-btn left" onclick="prevSlide()">❮</div>
+<div class="slider-btn right" onclick="nextSlide()">❯</div>
+    <!-- CONTENT -->
+    <div class="hero-content">
+        <h1>Welcome to Hotel Buddha</h1>
+        <p>Book premium rooms at best prices</p>
 
-    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:white; text-align:center;">
-        <h1 id="hero-text" style="font-size:50px; font-weight:bold;"></h1>
-        <p style="font-size:18px;">Book premium rooms at best prices</p>
-
-        <a href="{% url 'rooms' %}" class="btn btn-danger mt-3 px-4 py-2">
-            Explore Rooms
-        </a>
+        <a href="#" class="btn-main">ABOUT US</a>
+        <a href="/rooms/" class="btn-dark">BOOK NOW</a>
     </div>
+
+    <!-- DOTS -->
+    <div class="dots">
+        <span class="active"></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+</section>
+
+<div class="booking-bar premium-bar">
+
+    <input type="text" id="dateRange" placeholder="Select Dates" readonly>
+
+    <select id="guests">
+        <option>Guests</option>
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+    </select>
+
+    <select id="children">
+        <option>Children</option>
+        <option>0</option>
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+    </select>
+
+    <button class="check-btn">CHECK RATES</button>
 
 </div>
 
-<!-- ROOMS SECTION -->
-<div class="container mt-5">
 
-    <h2 class="text-center fw-bold">✨ Featured Rooms</h2>
-    <p class="text-center text-muted">Handpicked premium rooms for you</p>
+<!-- ===== ROOMS SECTION ===== -->
+<section class="rooms-section">
 
-    <!-- 🔥 FIXED ROW -->
-    <div class="row mt-4 justify-content-center">
+    <div class="container">
 
-        {% for room in rooms %}
-        <!-- 🔥 EACH CARD COLUMN -->
-        <div class="col-lg-4 col-md-6 col-12 mb-4 fade-in" style="animation-delay: {{ forloop.counter0 }}00ms;">
+        <h2 class="room-title">Best Rooms For You</h2>
 
-            <div class="card shadow-sm room-card"
-                 data-url="{% url 'room_detail' room.id %}">
+        <!-- SINGLE TABS  -->
+        <ul class="room-tabs text-center mb-4">
+            <li class="active" onclick="filterRoom('all', this)">ALL</li>
+            <li onclick="filterRoom('ac', this)">AC</li>
+            <li onclick="filterRoom('non-ac', this)">NON-AC</li>
+            <li onclick="filterRoom('deluxe', this)">DELUXE</li>
+        </ul>
 
-                <!-- 🔥 BADGE -->
-                {% if room.is_available %}
-                    <div class="badge-premium">🔥 Available</div>
-                {% else %}
-                    <div class="badge-premium" style="background:red;">Booked</div>
-                {% endif %}
+        <!--  ROOMS -->
+        <div class="row mt-5" id="roomContainer">
 
-                {% if room.images.first %}
-                <img src="{{ room.images.first.image.url }}" class="w-100 room-img">
-                {% endif %}
+            {% for room in rooms|slice:":3" %}
+            <div class="col-md-4 mb-4 room-item {{ room.room_type|lower }}">
 
-                <div class="p-3 text-center">
-                    <h4>{{ room.name }}</h4>
-                    <p>₹{{ room.price }} / night</p>
+                <div class="room-card-new" onclick="goRoom({{ room.id }})">
 
-                    <a href="{% url 'book_room' %}?room_id={{ room.id }}" class="btn btn-danger">
-                        Book Now
-                    </a>
+                    <div class="img-box">
+                        {% if room.images.first %}
+                        <img src="{{ room.images.first.image.url }}">
+                        {% else %}
+                        <img src="{% static 'images/hotel.jpg' %}">
+                        {% endif %}
+
+                        <span class="price-tag">₹{{ room.price }}</span>
+                    </div>
+
+                    <div class="room-content">
+                        <h4>{{ room.name }}</h4>
+
+                        <p class="room-desc">
+                            {{ room.description|truncatewords:10 }}
+                        </p>
+
+                        <div class="room-info">
+                            👤 {{ room.capacity }} Guests
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
+            {% endfor %}
 
         </div>
-        {% endfor %}
 
     </div>
 
-</div>
+</section>
 
-<!-- 🔥 CLICK SCRIPT -->
+<!-- ===== SERVICES / WHY CHOOSE ===== -->
+<section class="why-section">
+
+    <div class="container text-center">
+
+        <h2 class="why-title">Why Choose Us</h2>
+        <p class="why-sub">There are various facilities available like</p>
+
+        <div class="row mt-5">
+
+            <div class="col-md-3 col-6">
+                <div class="why-box"><i class="fas fa-wifi"></i></div>
+                <p>INTERNET</p>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="why-box"><i class="fas fa-glass-martini"></i></div>
+                <p>DRINKS</p>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="why-box"><i class="fas fa-coffee"></i></div>
+                <p>CONCIERGE</p>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="why-box"><i class="fas fa-swimmer"></i></div>
+                <p>POOL</p>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="why-box"><i class="fas fa-dumbbell"></i></div>
+                <p>FITNESS</p>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="why-box"><i class="fas fa-tshirt"></i></div>
+                <p>LAUNDRY</p>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="why-box"><i class="fas fa-utensils"></i></div>
+                <p>RESTAURANT</p>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="why-box"><i class="fas fa-spa"></i></div>
+                <p>SPA</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- FOOT REVIEW Sec -->
+<section class="reviews-section">
+
+    <div class="container">
+
+        <h2 class="text-center review-title">Customer Reviews</h2>
+
+        <div class="row mt-5">
+
+            {% for review in reviews %}
+            <div class="col-md-4 mb-4">
+
+                <div class="review-card">
+
+                    <!-- ⭐ Stars -->
+                    <div class="stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <!-- 📝 Text -->
+                    <p class="review-text">
+                        {{ review.comment|truncatewords:20 }}
+                    </p>
+
+                    <!-- quote -->
+                    <div class="quote">“</div>
+
+                </div>
+
+                <!-- 👤 USER NAME ONLY -->
+                <div class="review-user text-center mt-3">
+                    <h5>{{ review.user.username }}</h5>
+                    <p>Verified Guest</p>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+
 <script>
-document.querySelectorAll('.room-card').forEach(card => {
-    card.addEventListener('click', function(e) {
-        if (e.target.closest('a')) return;
-        window.location.href = this.getAttribute('data-url');
-    });
+function checkRooms(){
+    let date = document.getElementById("dateRange").value;
+    let guests = document.getElementById("guests").value;
+
+    if(!date || !guests){
+        alert("Please select date and guests");
+        return;
+    }
+
+    let dates = date.split(" to ");
+    let checkin = dates[0];
+    let checkout = dates[1];
+
+    window.location.href = `/rooms/?checkin=${checkin}&checkout=${checkout}&guests=${guests}`;
+}
+</script>
+<script>
+flatpickr("#dateRange", {
+    mode: "range",
+    minDate: "today",
+    dateFormat: "Y-m-d"
 });
 </script>
-
+<!-- SLIDER SCRIPT -->
 <script>
+let slides = document.querySelectorAll(".slide");
+let dots = document.querySelectorAll(".dots span");
 
-// 🔥 TYPEWRITER EFFECT
-const text = "Luxury Stay Experience";
-let i = 0;
+let index = 0;
 
-function typeEffect() {
-    if (i < text.length) {
-        document.getElementById("hero-text").innerHTML += text.charAt(i);
-        i++;
-        setTimeout(typeEffect, 50);
-    }
+function showSlide(i){
+
+    if(i >= slides.length) index = 0;
+    if(i < 0) index = slides.length - 1;
+
+    slides.forEach(s => s.classList.remove("active"));
+    dots.forEach(d => d.classList.remove("active"));
+
+    slides[index].classList.add("active");
+    dots[index].classList.add("active");
 }
-typeEffect();
 
-// 🔥 SCROLL ANIMATION
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('show');
+function nextSlide(){
+    index++;
+    showSlide(index);
+}
+
+function prevSlide(){
+    index--;
+    showSlide(index);
+}
+
+setInterval(() => {
+    nextSlide();
+}, 4000);
+</script>
+<script>
+function filterRooms(type){
+
+    let tabs = document.querySelectorAll(".tab");
+    tabs.forEach(t => t.classList.remove("active"));
+
+    event.target.classList.add("active");
+
+    let rooms = document.querySelectorAll(".room-item");
+
+    rooms.forEach(room => {
+
+        room.classList.remove("show");
+
+        if(type === 'all' || room.classList.contains(type)){
+            room.style.display = "block";
+
+            setTimeout(()=>{
+                room.classList.add("show");
+            },100);
+        } else {
+            room.style.display = "none";
+        }
+
+    });
+}
+
+/* AUTO ANIMATION LOAD */
+window.onload = () => {
+    document.querySelectorAll(".room-item").forEach((el,i)=>{
+        setTimeout(()=>{
+            el.classList.add("show");
+        }, i * 150);
+    });
+}
+</script>
+<!-- Card click SCRIPT -->
+<script>
+function goRoom(id){
+    window.location.href = "/room/" + id;
+}
+</script>
+<!-- filterkrne ke liye room front me -->
+<script>
+function filterRoom(type, el){
+
+    let items = document.querySelectorAll(".room-item");
+
+    // tabs active
+    document.querySelectorAll(".room-tabs li").forEach(tab=>{
+        tab.classList.remove("active");
+    });
+    el.classList.add("active");
+
+    items.forEach(item=>{
+        if(type === "all"){
+            item.style.display = "block";
+        }
+        else if(item.classList.contains(type)){
+            item.style.display = "block";
+        }
+        else{
+            item.style.display = "none";
         }
     });
-});
 
-document.querySelectorAll('.fade-in').forEach(el => {
-    el.classList.add('scroll-animate');
-    observer.observe(el);
-});
-
+}
 </script>
-
 {% endblock %}

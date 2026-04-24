@@ -8,7 +8,7 @@ from datetime import datetime
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
-from django.db.models import Avg
+from django.db.models import Avg, Q
 from django.http import JsonResponse
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
@@ -232,16 +232,35 @@ def my_bookings(request):
     return render(request, 'booking/my_bookings.html', {'bookings': bookings})
 
 
-# 🏠 HOME
-def home(request):
-    rooms = Room.objects.all()[:3]
-    return render(request, 'booking/home.html', {'rooms': rooms})
+#home
 
+def home(request):
+
+    # TOP 3 ROOMS (latest or highest price — choose one)
+    rooms = Room.objects.all().order_by('-id')[:3]
+
+    # CATEGORY WISE (top 3 each)
+    ac_rooms = Room.objects.filter(room_type='AC').order_by('-id')[:3]
+    non_ac_rooms = Room.objects.filter(room_type='NON-AC').order_by('-id')[:3]
+    deluxe_rooms = Room.objects.filter(room_type='DELUXE').order_by('-id')[:3]
+
+    # TOP 3 REVIEWS (HIGHEST RATING)
+    reviews = Review.objects.select_related('user')\
+        .order_by('-rating', '-id')[:3]
+
+    return render(request, 'booking/home.html', {
+        'rooms': rooms,
+        'ac_rooms': ac_rooms,
+        'non_ac_rooms': non_ac_rooms,
+        'deluxe_rooms': deluxe_rooms,
+        'reviews': reviews   # 🔥 IMPORTANT
+    })
 
 # 🏨 ROOMS
 def rooms(request):
     rooms = Room.objects.all().prefetch_related('reviews')
 
+    # ---------- EXISTING FILTERS ----------
     query = request.GET.get('q')
     if query:
         rooms = rooms.filter(name__icontains=query)
@@ -259,6 +278,35 @@ def rooms(request):
     if max_price:
         rooms = rooms.filter(price__lte=max_price)
 
+    # ---------- NEW: GUEST FILTER ----------
+    guests = request.GET.get('guests')
+    if guests:
+        try:
+            rooms = rooms.filter(capacity__gte=int(guests))
+        except:
+            pass
+
+    # ---------- NEW: DATE AVAILABILITY ----------
+    checkin = request.GET.get('checkin')
+    checkout = request.GET.get('checkout')
+
+    if checkin and checkout:
+        try:
+            checkin_date = datetime.strptime(checkin, "%Y-%m-%d").date()
+            checkout_date = datetime.strptime(checkout, "%Y-%m-%d").date()
+
+            # overlapping bookings
+            booked_rooms = Booking.objects.filter(
+                Q(check_in__lt=checkout_date) & Q(check_out__gt=checkin_date)
+            ).values_list('room_id', flat=True)
+
+            # remove booked rooms
+            rooms = rooms.exclude(id__in=booked_rooms)
+
+        except:
+            pass
+
+    # ---------- RATINGS ----------
     for room in rooms:
         room.avg_rating = room.reviews.aggregate(avg=Avg('rating'))['avg']
 
